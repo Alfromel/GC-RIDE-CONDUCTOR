@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GC Ride - Conductor</title>
+    <meta name="theme-color" content="#2e7d32">
+    <meta name="description" content="Panel del Conductor GC Ride">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+ <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+ <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+ <link rel="shortcut icon" href="/favicon.ico" />
+ <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+ <meta name="apple-mobile-web-app-title" content="Socio GC" />
+ <link rel="manifest" href="/site.webmanifest" />
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-dark: #1b5e20;
+            --primary-light: #4caf50;
+            --accent-color: #8bc34a;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --gray: #9e9e9e;
+            --dark-gray: #616161;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        
+        .app-content {
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+        
+        .app-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+        
+        .app-card-header {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #e8f5e9 100%);
+            border-bottom: 1px solid #e9ecef;
+            padding: 15px 20px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        .app-card-body {
+            padding: 20px;
+        }
+        
+        .app-btn {
+            border-radius: 50px;
+            padding: 12px 25px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .app-btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+        }
+        
+        .app-btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(46, 125, 50, 0.4);
+        }
+        
+        .app-form-control {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+        
+        .app-form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+        }
+        
+        .status-toggle {
+            width: 60px;
+            height: 30px;
+            background-color: #ccc;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .status-toggle.active {
+            background-color: var(--primary-color);
+        }
+        
+        .status-toggle-handle {
+            width: 26px;
+            height: 26px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+        
+        .status-toggle.active .status-toggle-handle {
+            transform: translateX(30px);
+        }
+        
+        #map {
+            height: 300px;
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .ride-request {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(46, 125, 50, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .floating-action-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.5);
+            z-index: 100;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .floating-action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(46, 125, 50, 0.7);
+        }
+        
+        .badge-status {
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-online {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .badge-offline {
+            background: #ccc;
+            color: #666;
+        }
+        
+        .badge-ride {
+            background: #ff9800;
+            color: white;
+        }
+        
+        .login-container {
+            background: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .brand {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Nuevos estilos para el botón de perfil y modal */
+        .profile-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+            transition: all 0.3s;
+            margin: 15px auto;
+            width: fit-content;
+        }
+        
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(46, 125, 50, 0.4);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+        }
+        
+        .profile-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .profile-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .profile-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            overflow: hidden;
+        }
+        
+        .profile-modal.active .profile-modal-content {
+            transform: translateY(0);
+        }
+        
+        .profile-modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .profile-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .profile-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 2rem;
+            margin: 0 auto 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .profile-modal-body {
+            padding: 20px;
+        }
+        
+        .profile-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .profile-info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .profile-info-label {
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+        
+        .profile-info-value {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+        
+        /* Estilos para la ventana flotante de solicitudes */
+        .request-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .request-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .request-modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+            overflow: hidden;
+            animation: pulse 2s infinite;
+        }
+        
+        .request-modal.active .request-modal-content {
+            transform: translateY(0);
+        }
+        
+        .request-modal-header {
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .request-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .request-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .request-modal-body {
+            padding: 20px;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+            }
+        }
+        
+        .request-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.5rem;
+            margin: 0 auto 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        /* Estilos para el botón de instalación PWA */
+        .install-btn {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
+            z-index: 100;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .install-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Pantalla de Login -->
+        <div id="loginScreen" class="login-container">
+            <div class="text-center mb-5">
+                <h1 class="brand mb-2">GC Ride</h1>
+                <p class="text-muted">Panel del Conductor</p>
+            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Usuario</label>
+                    <input type="text" class="form-control app-form-control" id="username" required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control app-form-control" id="password" required>
+                </div>
+                <button type="submit" class="btn app-btn app-btn-primary w-100 text-white">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Ingresar
+                </button>
+            </form>
+            <div id="loginMessage" class="alert alert-danger mt-3 d-none"></div>
+        </div>
+
+        <!-- Pantalla Principal -->
+        <div id="mainScreen" class="d-none">
+            <!-- Header de la app -->
+            <div class="app-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small id="driverName" class="fw-bold"></small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span id="statusBadge" class="badge-status badge-offline me-2">Desconectado</span>
+                        <div class="user-avatar">
+                            <span id="userInitial">C</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="app-content">
+                <!-- Botón de Perfil -->
+                <button id="profileBtn" class="profile-btn">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Mi Perfil</span>
+                </button>
+
+                <!-- Estado de conexión -->
+                <div class="app-card">
+                    <div class="app-card-header d-flex align-items-center">
+                        <i class="bi bi-toggle-on me-2"></i>
+                        <span>Estado de Trabajo</span>
+                    </div>
+                    <div class="app-card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span id="statusText">Desconectado</span>
+                            <div id="statusToggle" class="status-toggle">
+                                <div class="status-toggle-handle"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mapa -->
+                <div class="app-card">
+                    <div class="app-card-header d-flex align-items-center">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        <span>Mi Ubicación</span>
+                    </div>
+                    <div class="app-card-body">
+                        <div id="map"></div>
+                    </div>
+                </div>
+
+                <!-- Solicitudes de viaje -->
+                <div id="rideRequestsSection" class="d-none">
+                    <div class="app-card">
+                        <div class="app-card-header d-flex align-items-center">
+                            <i class="bi bi-bell me-2"></i>
+                            <span>Solicitudes de Viaje</span>
+                        </div>
+                        <div class="app-card-body">
+                            <div id="rideRequestsList">
+                                <!-- Las solicitudes aparecerán aquí -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Viaje en curso -->
+                <div id="activeRideSection" class="d-none">
+                    <div class="app-card">
+                        <div class="app-card-header d-flex align-items-center">
+                            <i class="bi bi-car-front me-2"></i>
+                            <span>Viaje en Curso</span>
+                        </div>
+                        <div class="app-card-body">
+                            <div id="activeRideInfo">
+                                <!-- Información del viaje activo -->
+                            </div>
+                            <div class="mt-3">
+                                <button id="completeRideBtn" class="btn app-btn app-btn-primary w-100">
+                                    <i class="bi bi-check-circle me-2"></i> Completar Viaje
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Perfil -->
+            <div id="profileModal" class="profile-modal">
+                <div class="profile-modal-content">
+                    <div class="profile-modal-header">
+                        <button class="profile-modal-close" id="profileModalClose">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        <div class="profile-avatar">
+                            <span id="profileAvatarInitial">C</span>
+                        </div>
+                        <h5 id="profileDriverName" class="mb-0">Nombre del Conductor</h5>
+                        <p class="mb-0 opacity-75" id="profileDriverType">TAXI</p>
+                    </div>
+                    <div class="profile-modal-body">
+                        <div class="profile-info-item">
+                            <span class="profile-info-label">Nombre:</span>
+                            <span class="profile-info-value" id="profileInfoName"></span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="profile-info-label">Tipo de Vehículo:</span>
+                            <span class="profile-info-value" id="profileInfoType">TAXI</span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="profile-info-label">Modelo:</span>
+                            <span class="profile-info-value" id="profileInfoModel"></span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="profile-info-label">Placa:</span>
+                            <span class="profile-info-value" id="profileInfoPlate"></span>
+                        </div>
+                        <div class="profile-info-item">
+                            <span class="profile-info-label">Asientos:</span>
+                            <span class="profile-info-value" id="profileInfoSeats"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de Solicitud de Viaje -->
+            <div id="requestModal" class="request-modal">
+                <div class="request-modal-content">
+                    <div class="request-modal-header">
+                        <button class="request-modal-close" id="requestModalClose">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                        <div class="request-avatar">
+                            <span id="requestAvatarInitial">U</span>
+                        </div>
+                        <h5 id="requestClientName" class="mb-0">Nueva Solicitud de Viaje</h5>
+                        <p class="mb-0 opacity-75">Cliente esperando</p>
+                    </div>
+                    <div class="request-modal-body">
+                        <div id="requestModalInfo">
+                            <!-- Información de la solicitud -->
+                        </div>
+                        <div class="d-flex gap-2 mt-4">
+                            <button id="acceptRequestBtn" class="btn btn-success flex-grow-1">
+                                <i class="bi bi-check-lg me-1"></i> Aceptar Viaje
+                            </button>
+                            <button id="declineRequestBtn" class="btn btn-secondary">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón flotante para cerrar sesión -->
+            <button id="logoutBtn" class="floating-action-btn" title="Cerrar sesión">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+            
+            <!-- Botón flotante para instalar la app PWA -->
+            <button id="installBtn" class="install-btn d-none" title="Instalar aplicación">
+                <i class="bi bi-download"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://opqofysokhubsbstwmxo.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wcW9meXNva2h1YnNic3R3bXhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzMTM5OTgsImV4cCI6MjA3ODg4OTk5OH0.LxG5DKuqE0brplBkCuetmCR_cHtTfzDQOlzBf3mnjvU';
+
+        // Estado de la aplicación
+        let currentDriver = null;
+        let driverMap = null;
+        let driverMarker = null;
+        let watchId = null;
+        let currentRide = null;
+        let rideCheckInterval = null;
+        let currentRequest = null;
+        let processedRequests = new Set();
+        let deferredPrompt = null; // Para PWA
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+            initializePWA();
+        });
+
+        // Funciones PWA
+        function initializePWA() {
+            // Registrar Service Worker
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw-driver.js')
+                        .then(function(registration) {
+                            console.log('Service Worker registrado con éxito:', registration.scope);
+                        })
+                        .catch(function(error) {
+                            console.log('Error al registrar Service Worker:', error);
+                        });
+                });
+            }
+
+            // Manejar el evento beforeinstallprompt
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                // Mostrar el botón de instalación
+                const installBtn = document.getElementById('installBtn');
+                if (installBtn) {
+                    installBtn.classList.remove('d-none');
+                }
+            });
+
+            // Manejar el evento appinstalled
+            window.addEventListener('appinstalled', (e) => {
+                console.log('App instalada');
+                const installBtn = document.getElementById('installBtn');
+                if (installBtn) {
+                    installBtn.classList.add('d-none');
+                }
+                deferredPrompt = null;
+            });
+
+            // Configurar el botón de instalación
+            const installBtn = document.getElementById('installBtn');
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`Resultado de la instalación: ${outcome}`);
+                        deferredPrompt = null;
+                        installBtn.classList.add('d-none');
+                    }
+                });
+            }
+        }
+
+        function initializeApp() {
+            // Verificar si ya hay una sesión activa
+            const savedDriver = localStorage.getItem('currentDriver');
+            if (savedDriver) {
+                currentDriver = JSON.parse(savedDriver);
+                showMainScreen();
+            }
+
+            // Configurar event listeners
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            document.getElementById('statusToggle').addEventListener('click', toggleOnlineStatus);
+            document.getElementById('completeRideBtn').addEventListener('click', completeRide);
+            document.getElementById('profileBtn').addEventListener('click', showProfileModal);
+            document.getElementById('profileModalClose').addEventListener('click', hideProfileModal);
+            document.getElementById('requestModalClose').addEventListener('click', hideRequestModal);
+            document.getElementById('acceptRequestBtn').addEventListener('click', acceptCurrentRequest);
+            document.getElementById('declineRequestBtn').addEventListener('click', declineCurrentRequest);
+            
+            // Cerrar modales al hacer clic fuera del contenido
+            document.getElementById('profileModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideProfileModal();
+                }
+            });
+            
+            document.getElementById('requestModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideRequestModal();
+                }
+            });
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('loginMessage');
+
+            messageDiv.textContent = 'Verificando credenciales...';
+            messageDiv.className = 'alert alert-info mt-3';
+            messageDiv.classList.remove('d-none');
+
+            try {
+                const drivers = await loadDriversFromDatabase();
+                const driver = drivers.find(d => d.username === username && d.password === password);
+                
+                if (driver) {
+                    currentDriver = driver;
+                    localStorage.setItem('currentDriver', JSON.stringify(driver));
+                    showMainScreen();
+                    messageDiv.classList.add('d-none');
+                } else {
+                    messageDiv.textContent = 'Usuario o contraseña incorrectos';
+                    messageDiv.className = 'alert alert-danger mt-3';
+                }
+            } catch (error) {
+                console.error('Error en el login:', error);
+                messageDiv.textContent = 'Error de conexión. Intente nuevamente.';
+                messageDiv.className = 'alert alert-danger mt-3';
+            }
+        }
+
+        function handleLogout() {
+            if (watchId) {
+                navigator.geolocation.clearWatch(watchId);
+            }
+            
+            if (rideCheckInterval) {
+                clearInterval(rideCheckInterval);
+            }
+            
+            if (currentDriver) {
+                updateDriverStatus(false, null, null);
+            }
+            
+            currentDriver = null;
+            localStorage.removeItem('currentDriver');
+            showLoginScreen();
+        }
+
+        function showLoginScreen() {
+            document.getElementById('loginScreen').classList.remove('d-none');
+            document.getElementById('mainScreen').classList.add('d-none');
+            document.getElementById('loginForm').reset();
+        }
+
+        function showMainScreen() {
+            document.getElementById('loginScreen').classList.add('d-none');
+            document.getElementById('mainScreen').classList.remove('d-none');
+            
+            document.getElementById('driverName').textContent = currentDriver.nombre;
+            document.getElementById('userInitial').textContent = currentDriver.nombre.charAt(0);
+            
+            initMap();
+            updateStatusDisplay(currentDriver.en_linea);
+            startRideCheck();
+        }
+
+        function showProfileModal() {
+            document.getElementById('profileAvatarInitial').textContent = currentDriver.nombre.charAt(0);
+            document.getElementById('profileDriverName').textContent = currentDriver.nombre;
+            document.getElementById('profileDriverType').textContent = currentDriver.tipo_vehiculo || 'TAXI';
+            document.getElementById('profileInfoName').textContent = currentDriver.nombre;
+            document.getElementById('profileInfoType').textContent = currentDriver.tipo_vehiculo || 'TAXI';
+            document.getElementById('profileInfoModel').textContent = currentDriver.modelo_vehiculo || 'No especificado';
+            document.getElementById('profileInfoPlate').textContent = currentDriver.placa_vehiculo || 'No especificado';
+            document.getElementById('profileInfoSeats').textContent = currentDriver.asientos || 4;
+            
+            document.getElementById('profileModal').classList.add('active');
+        }
+
+        function hideProfileModal() {
+            document.getElementById('profileModal').classList.remove('active');
+        }
+
+        function showRequestModal(request) {
+            currentRequest = request;
+            
+            document.getElementById('requestAvatarInitial').textContent = request.clients.nombre.charAt(0);
+            document.getElementById('requestClientName').textContent = request.clients.nombre;
+            
+            const distance = calculateDistance(
+                currentDriver.latitud, currentDriver.longitud,
+                request.origen_lat, request.origen_lng
+            );
+            
+            document.getElementById('requestModalInfo').innerHTML = `
+                <div class="d-flex align-items-center mb-3">
+                    <div class="user-avatar me-3">
+                        <span>${request.clients.nombre.charAt(0)}</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">${request.clients.nombre}</h6>
+                        <small class="text-muted">${request.clients.edad} años</small>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Distancia: ${distance.toFixed(1)} km</small>
+                </div>
+            `;
+            
+            document.getElementById('requestModal').classList.add('active');
+        }
+
+        function hideRequestModal() {
+            document.getElementById('requestModal').classList.remove('active');
+            currentRequest = null;
+        }
+
+        function acceptCurrentRequest() {
+            if (currentRequest) {
+                acceptRide(currentRequest.id);
+                hideRequestModal();
+            }
+        }
+
+        function declineCurrentRequest() {
+            if (currentRequest) {
+                processedRequests.add(currentRequest.id);
+                hideRequestModal();
+            }
+        }
+
+        function initMap() {
+            driverMap = L.map('map').setView([-16.5000, -68.1500], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(driverMap);
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        driverMap.setView([lat, lng], 15);
+                        
+                        driverMarker = L.marker([lat, lng])
+                            .addTo(driverMap)
+                            .bindPopup('Tu ubicación actual')
+                            .openPopup();
+                            
+                        startLocationTracking();
+                    },
+                    function(error) {
+                        console.error('Error obteniendo ubicación:', error);
+                        alert('No se pudo obtener tu ubicación. Asegúrate de permitir el acceso a la ubicación.');
+                    }
+                );
+            } else {
+                alert('Tu navegador no soporta geolocalización.');
+            }
+        }
+
+        function startLocationTracking() {
+            watchId = navigator.geolocation.watchPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    if (driverMarker) {
+                        driverMarker.setLatLng([lat, lng]);
+                    } else {
+                        driverMarker = L.marker([lat, lng])
+                            .addTo(driverMap)
+                            .bindPopup('Tu ubicación actual');
+                    }
+                    
+                    if (currentDriver && currentDriver.en_linea) {
+                        updateDriverLocation(lat, lng);
+                    }
+                },
+                function(error) {
+                    console.error('Error en seguimiento de ubicación:', error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                }
+            );
+        }
+
+        function toggleOnlineStatus() {
+            const statusToggle = document.getElementById('statusToggle');
+            const isOnline = !statusToggle.classList.contains('active');
+            
+            if (isOnline) {
+                updateDriverStatus(true);
+                updateStatusDisplay(true);
+                
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            updateDriverLocation(lat, lng);
+                        },
+                        function(error) {
+                            console.error('Error obteniendo ubicación:', error);
+                        }
+                    );
+                }
+            } else {
+                updateDriverStatus(false);
+                updateStatusDisplay(false);
+                document.getElementById('rideRequestsSection').classList.add('d-none');
+            }
+        }
+
+        function updateStatusDisplay(isOnline) {
+            const statusToggle = document.getElementById('statusToggle');
+            const statusText = document.getElementById('statusText');
+            const statusBadge = document.getElementById('statusBadge');
+            
+            if (isOnline) {
+                statusToggle.classList.add('active');
+                statusText.textContent = 'En Línea - Recibiendo solicitudes';
+                statusBadge.textContent = 'En Línea';
+                statusBadge.className = 'badge-status badge-online me-2';
+            } else {
+                statusToggle.classList.remove('active');
+                statusText.textContent = 'Desconectado';
+                statusBadge.textContent = 'Desconectado';
+                statusBadge.className = 'badge-status badge-offline me-2';
+            }
+        }
+
+        async function updateDriverStatus(isOnline, lat = null, lng = null) {
+            try {
+                const updateData = {
+                    en_linea: isOnline,
+                    disponible: isOnline
+                };
+                
+                if (lat !== null && lng !== null) {
+                    updateData.latitud = lat;
+                    updateData.longitud = lng;
+                }
+                
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(updateData)
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error al actualizar estado');
+                }
+                
+                currentDriver.en_linea = isOnline;
+                currentDriver.disponible = isOnline;
+                if (lat !== null && lng !== null) {
+                    currentDriver.latitud = lat;
+                    currentDriver.longitud = lng;
+                }
+                
+                localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
+                
+            } catch (error) {
+                console.error('Error al actualizar estado:', error);
+            }
+        }
+
+        async function updateDriverLocation(lat, lng) {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({
+                            latitud: lat,
+                            longitud: lng
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error al actualizar ubicación');
+                }
+                
+                currentDriver.latitud = lat;
+                currentDriver.longitud = lng;
+                localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
+                
+            } catch (error) {
+                console.error('Error al actualizar ubicación:', error);
+            }
+        }
+
+        async function loadDriversFromDatabase() {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/drivers`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar conductores');
+                }
+
+                const drivers = await response.json();
+                return drivers;
+                
+            } catch (error) {
+                console.error('Error al cargar conductores:', error);
+                throw new Error('No se pudo conectar con la base de datos. Intente nuevamente.');
+            }
+        }
+
+        function startRideCheck() {
+            rideCheckInterval = setInterval(async () => {
+                if (currentDriver && currentDriver.en_linea) {
+                    await checkForRideRequests();
+                    await checkActiveRide();
+                }
+            }, 5000);
+        }
+
+        async function checkForRideRequests() {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rides?estado=eq.solicitado&select=*,clients(nombre,edad)`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar solicitudes');
+                }
+
+                const rideRequests = await response.json();
+                
+                if (rideRequests.length > 0) {
+                    for (const request of rideRequests) {
+                        if (!processedRequests.has(request.id)) {
+                            showRequestModal(request);
+                            break;
+                        }
+                    }
+                    
+                    displayRideRequests(rideRequests);
+                    document.getElementById('rideRequestsSection').classList.remove('d-none');
+                } else {
+                    document.getElementById('rideRequestsSection').classList.add('d-none');
+                }
+                
+            } catch (error) {
+                console.error('Error al verificar solicitudes:', error);
+            }
+        }
+
+        function displayRideRequests(requests) {
+            const requestsList = document.getElementById('rideRequestsList');
+            
+            requestsList.innerHTML = requests.map(request => {
+                const distance = calculateDistance(
+                    currentDriver.latitud, currentDriver.longitud,
+                    request.origen_lat, request.origen_lng
+                );
+                
+                return `
+                <div class="ride-request">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="user-avatar me-3">
+                            <span>${request.clients.nombre.charAt(0)}</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">${request.clients.nombre}</h6>
+                            <small class="text-muted">${request.clients.edad} años</small>
+                        </div>
+                        <span class="badge badge-ride">${distance.toFixed(1)} km</span>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Distancia: ${distance.toFixed(1)} km</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success btn-sm flex-grow-1" onclick="acceptRide(${request.id})">
+                            <i class="bi bi-check-lg me-1"></i> Aceptar
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="declineRide(${request.id})">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        async function acceptRide(rideId) {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({
+                            driver_id: currentDriver.id,
+                            estado: 'aceptado'
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error al aceptar viaje');
+                }
+                
+                processedRequests.add(rideId);
+                await updateDriverStatus(true, currentDriver.latitud, currentDriver.longitud);
+                document.getElementById('rideRequestsSection').classList.add('d-none');
+                await loadActiveRide();
+                
+            } catch (error) {
+                console.error('Error al aceptar viaje:', error);
+                alert('Error al aceptar el viaje. Intente nuevamente.');
+            }
+        }
+
+        async function declineRide(rideId) {
+            processedRequests.add(rideId);
+            document.getElementById('rideRequestsSection').classList.add('d-none');
+        }
+
+        async function checkActiveRide() {
+            if (currentDriver) {
+                await loadActiveRide();
+            }
+        }
+
+        async function loadActiveRide() {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rides?driver_id=eq.${currentDriver.id}&estado=in.(aceptado,en_camino)&select=*,clients(nombre,edad)`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error al cargar viaje activo');
+                }
+
+                const activeRides = await response.json();
+                
+                if (activeRides.length > 0) {
+                    currentRide = activeRides[0];
+                    displayActiveRide(currentRide);
+                    document.getElementById('activeRideSection').classList.remove('d-none');
+                    await updateDriverStatus(true, currentDriver.latitud, currentDriver.longitud);
+                } else {
+                    currentRide = null;
+                    document.getElementById('activeRideSection').classList.add('d-none');
+                }
+                
+            } catch (error) {
+                console.error('Error al verificar viaje activo:', error);
+            }
+        }
+
+        function displayActiveRide(ride) {
+            const activeRideInfo = document.getElementById('activeRideInfo');
+            const distance = calculateDistance(
+                currentDriver.latitud, currentDriver.longitud,
+                ride.origen_lat, ride.origen_lng
+            );
+            
+            activeRideInfo.innerHTML = `
+                <div class="d-flex align-items-center mb-3">
+                    <div class="user-avatar me-3">
+                        <span>${ride.clients.nombre.charAt(0)}</span>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">${ride.clients.nombre}</h6>
+                        <small class="text-muted">${ride.clients.edad} años</small>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Distancia al cliente: ${distance.toFixed(1)} km</small>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Estado: ${ride.estado === 'aceptado' ? 'Esperando cliente' : 'En camino al destino'}</small>
+                </div>
+            `;
+            
+            if (ride.estado === 'aceptado') {
+                activeRideInfo.innerHTML += `
+                    <div class="mt-3">
+                        <button class="btn app-btn app-btn-primary w-100" onclick="startRide(${ride.id})">
+                            <i class="bi bi-play-circle me-2"></i> Iniciar Viaje
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        async function startRide(rideId) {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({
+                            estado: 'en_camino'
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error al iniciar viaje');
+                }
+                
+                await loadActiveRide();
+                
+            } catch (error) {
+                console.error('Error al iniciar viaje:', error);
+                alert('Error al iniciar el viaje. Intente nuevamente.');
+            }
+        }
+
+        async function completeRide() {
+            if (!currentRide) return;
+            
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${currentRide.id}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({
+                            estado: 'completado'
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error al completar viaje');
+                }
+                
+                currentRide = null;
+                document.getElementById('activeRideSection').classList.add('d-none');
+                await updateDriverStatus(true, currentDriver.latitud, currentDriver.longitud);
+                alert('Viaje completado exitosamente');
+                
+            } catch (error) {
+                console.error('Error al completar viaje:', error);
+                alert('Error al completar el viaje. Intente nuevamente.');
+            }
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const distance = R * c;
+            return distance;
+        }
+
+        // Hacer funciones accesibles globalmente
+        window.acceptRide = acceptRide;
+        window.declineRide = declineRide;
+        window.startRide = startRide;
+    </script>
+</body>
+</html>
