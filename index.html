@@ -4,24 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GC Ride - Conductor</title>
-    <meta name="theme-color" content="#2e7d32">
-    <meta name="description" content="Panel del Conductor GC Ride">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
- <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
- <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
- <link rel="shortcut icon" href="/favicon.ico" />
- <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
- <meta name="apple-mobile-web-app-title" content="Socio GC" />
- <link rel="manifest" href="/site.webmanifest" />
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
     <style>
         :root {
             --primary-color: #2e7d32;
@@ -244,7 +230,7 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        /* Nuevos estilos para el botón de perfil y modal */
+        /* Estilos para modales */
         .profile-btn {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
             color: white;
@@ -267,7 +253,7 @@
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
         }
         
-        .profile-modal {
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -283,12 +269,12 @@
             transition: all 0.3s;
         }
         
-        .profile-modal.active {
+        .modal-overlay.active {
             opacity: 1;
             visibility: visible;
         }
         
-        .profile-modal-content {
+        .modal-content {
             background: white;
             border-radius: 16px;
             width: 90%;
@@ -299,11 +285,11 @@
             overflow: hidden;
         }
         
-        .profile-modal.active .profile-modal-content {
+        .modal-overlay.active .modal-content {
             transform: translateY(0);
         }
         
-        .profile-modal-header {
+        .modal-header {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
             padding: 20px;
@@ -311,7 +297,7 @@
             position: relative;
         }
         
-        .profile-modal-close {
+        .modal-close {
             position: absolute;
             top: 15px;
             right: 15px;
@@ -328,11 +314,11 @@
             transition: background 0.3s;
         }
         
-        .profile-modal-close:hover {
+        .modal-close:hover {
             background: rgba(255, 255, 255, 0.3);
         }
         
-        .profile-avatar {
+        .modal-avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
@@ -347,100 +333,34 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         
-        .profile-modal-body {
+        .modal-body {
             padding: 20px;
         }
         
-        .profile-info-item {
+        .info-item {
             display: flex;
             justify-content: space-between;
             padding: 12px 0;
             border-bottom: 1px solid #f0f0f0;
         }
         
-        .profile-info-item:last-child {
+        .info-item:last-child {
             border-bottom: none;
         }
         
-        .profile-info-label {
+        .info-label {
             color: var(--dark-gray);
             font-weight: 500;
         }
         
-        .profile-info-value {
+        .info-value {
             color: var(--text-color);
             font-weight: 600;
         }
         
-        /* Estilos para la ventana flotante de solicitudes */
-        .request-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1001;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .request-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .request-modal-content {
-            background: white;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transform: translateY(20px);
-            transition: transform 0.3s;
-            overflow: hidden;
-            animation: pulse 2s infinite;
-        }
-        
-        .request-modal.active .request-modal-content {
-            transform: translateY(0);
-        }
-        
-        .request-modal-header {
+        /* Estilos específicos para modal de solicitud */
+        .request-modal .modal-header {
             background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .request-modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        
-        .request-modal-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        .request-modal-body {
-            padding: 20px;
         }
         
         @keyframes pulse {
@@ -455,44 +375,60 @@
             }
         }
         
-        .request-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
-            font-size: 1.5rem;
-            margin: 0 auto 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        .pulse-modal {
+            animation: pulse 2s infinite;
         }
         
-        /* Estilos para el botón de instalación PWA */
-        .install-btn {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
-            z-index: 100;
-            border: none;
-            transition: all 0.3s;
+        .price-display {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin: 15px 0;
+            border: 2px solid #2196f3;
         }
         
-        .install-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 25px rgba(255, 152, 0, 0.7);
+        .price-display h4 {
+            color: #1976d2;
+            margin: 0;
+        }
+        
+        .price-display small {
+            color: #0d47a1;
+            font-weight: 500;
+        }
+        
+        .leaflet-routing-container {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .ride-info-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-left: 4px solid #ff9800;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -526,6 +462,7 @@
             <div class="app-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
+                        <h5 class="mb-0">GC Ride</h5>
                         <small id="driverName" class="fw-bold"></small>
                     </div>
                     <div class="d-flex align-items-center">
@@ -572,6 +509,42 @@
                     </div>
                 </div>
 
+                <!-- Viaje en curso -->
+                <div id="activeRideSection" class="d-none">
+                    <div class="ride-info-panel">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="user-avatar me-3">
+                                <span id="rideClientInitial">C</span>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0" id="rideClientName">Cliente</h6>
+                                <small class="text-muted" id="rideClientAge">Edad</small>
+                            </div>
+                            <span id="rideStatusBadge" class="badge-ride badge-status">En Camino</span>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="d-flex justify-content-between mb-1">
+                                <small id="rideOriginAddress">Origen</small>
+                                <small id="rideEtaText">Llegando en 5 min</small>
+                            </div>
+                            <div class="progress">
+                                <div id="rideProgress" class="progress-bar" style="width: 0%"></div>
+                            </div>
+                            <small id="rideDestinationAddress" class="text-muted">Destino</small>
+                        </div>
+                        
+                        <div class="price-display mt-3">
+                            <h4 id="ridePrice">13 Bs</h4>
+                            <small>Total del viaje</small>
+                        </div>
+                        
+                        <div id="rideControls" class="mt-3">
+                            <!-- Los botones de control aparecerán aquí -->
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Solicitudes de viaje -->
                 <div id="rideRequestsSection" class="d-none">
                     <div class="app-card">
@@ -586,80 +559,60 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Viaje en curso -->
-                <div id="activeRideSection" class="d-none">
-                    <div class="app-card">
-                        <div class="app-card-header d-flex align-items-center">
-                            <i class="bi bi-car-front me-2"></i>
-                            <span>Viaje en Curso</span>
-                        </div>
-                        <div class="app-card-body">
-                            <div id="activeRideInfo">
-                                <!-- Información del viaje activo -->
-                            </div>
-                            <div class="mt-3">
-                                <button id="completeRideBtn" class="btn app-btn app-btn-primary w-100">
-                                    <i class="bi bi-check-circle me-2"></i> Completar Viaje
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Modal de Perfil -->
-            <div id="profileModal" class="profile-modal">
-                <div class="profile-modal-content">
-                    <div class="profile-modal-header">
-                        <button class="profile-modal-close" id="profileModalClose">
+            <div id="profileModal" class="modal-overlay">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="modal-close" id="profileModalClose">
                             <i class="bi bi-x-lg"></i>
                         </button>
-                        <div class="profile-avatar">
+                        <div class="modal-avatar">
                             <span id="profileAvatarInitial">C</span>
                         </div>
                         <h5 id="profileDriverName" class="mb-0">Nombre del Conductor</h5>
                         <p class="mb-0 opacity-75" id="profileDriverType">TAXI</p>
                     </div>
-                    <div class="profile-modal-body">
-                        <div class="profile-info-item">
-                            <span class="profile-info-label">Nombre:</span>
-                            <span class="profile-info-value" id="profileInfoName"></span>
+                    <div class="modal-body">
+                        <div class="info-item">
+                            <span class="info-label">Nombre:</span>
+                            <span class="info-value" id="profileInfoName"></span>
                         </div>
-                        <div class="profile-info-item">
-                            <span class="profile-info-label">Tipo de Vehículo:</span>
-                            <span class="profile-info-value" id="profileInfoType">TAXI</span>
+                        <div class="info-item">
+                            <span class="info-label">Tipo de Vehículo:</span>
+                            <span class="info-value" id="profileInfoType">TAXI</span>
                         </div>
-                        <div class="profile-info-item">
-                            <span class="profile-info-label">Modelo:</span>
-                            <span class="profile-info-value" id="profileInfoModel"></span>
+                        <div class="info-item">
+                            <span class="info-label">Modelo:</span>
+                            <span class="info-value" id="profileInfoModel"></span>
                         </div>
-                        <div class="profile-info-item">
-                            <span class="profile-info-label">Placa:</span>
-                            <span class="profile-info-value" id="profileInfoPlate"></span>
+                        <div class="info-item">
+                            <span class="info-label">Placa:</span>
+                            <span class="info-value" id="profileInfoPlate"></span>
                         </div>
-                        <div class="profile-info-item">
-                            <span class="profile-info-label">Asientos:</span>
-                            <span class="profile-info-value" id="profileInfoSeats"></span>
+                        <div class="info-item">
+                            <span class="info-label">Asientos:</span>
+                            <span class="info-value" id="profileInfoSeats"></span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Modal de Solicitud de Viaje -->
-            <div id="requestModal" class="request-modal">
-                <div class="request-modal-content">
-                    <div class="request-modal-header">
-                        <button class="request-modal-close" id="requestModalClose">
+            <div id="requestModal" class="modal-overlay request-modal">
+                <div class="modal-content pulse-modal">
+                    <div class="modal-header">
+                        <button class="modal-close" id="requestModalClose">
                             <i class="bi bi-x-lg"></i>
                         </button>
-                        <div class="request-avatar">
+                        <div class="modal-avatar">
                             <span id="requestAvatarInitial">U</span>
                         </div>
                         <h5 id="requestClientName" class="mb-0">Nueva Solicitud de Viaje</h5>
                         <p class="mb-0 opacity-75">Cliente esperando</p>
                     </div>
-                    <div class="request-modal-body">
+                    <div class="modal-body">
                         <div id="requestModalInfo">
                             <!-- Información de la solicitud -->
                         </div>
@@ -679,11 +632,6 @@
             <button id="logoutBtn" class="floating-action-btn" title="Cerrar sesión">
                 <i class="bi bi-box-arrow-right"></i>
             </button>
-            
-            <!-- Botón flotante para instalar la app PWA -->
-            <button id="installBtn" class="install-btn d-none" title="Instalar aplicación">
-                <i class="bi bi-download"></i>
-            </button>
         </div>
     </div>
 
@@ -691,11 +639,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Leaflet Routing Machine -->
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     
     <script>
         // Configuración de Supabase
-        const SUPABASE_URL = 'https://opqofysokhubsbstwmxo.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wcW9meXNva2h1YnNic3R3bXhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMzMTM5OTgsImV4cCI6MjA3ODg4OTk5OH0.LxG5DKuqE0brplBkCuetmCR_cHtTfzDQOlzBf3mnjvU';
+        const SUPABASE_URL = 'https://vdpljnauvwkbfmnbjodb.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGxqbmF1dndrYmZtbmJqb2RiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNTQyMzQsImV4cCI6MjA4MDYzMDIzNH0.in0E5S0D7c9O5wkgQk_YuHU7aM0YXlxMR-xFa18joiw';
 
         // Estado de la aplicación
         let currentDriver = null;
@@ -706,64 +656,12 @@
         let rideCheckInterval = null;
         let currentRequest = null;
         let processedRequests = new Set();
-        let deferredPrompt = null; // Para PWA
+        let routingControl = null;
 
         // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
-            initializePWA();
         });
-
-        // Funciones PWA
-        function initializePWA() {
-            // Registrar Service Worker
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                    navigator.serviceWorker.register('/sw-driver.js')
-                        .then(function(registration) {
-                            console.log('Service Worker registrado con éxito:', registration.scope);
-                        })
-                        .catch(function(error) {
-                            console.log('Error al registrar Service Worker:', error);
-                        });
-                });
-            }
-
-            // Manejar el evento beforeinstallprompt
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                // Mostrar el botón de instalación
-                const installBtn = document.getElementById('installBtn');
-                if (installBtn) {
-                    installBtn.classList.remove('d-none');
-                }
-            });
-
-            // Manejar el evento appinstalled
-            window.addEventListener('appinstalled', (e) => {
-                console.log('App instalada');
-                const installBtn = document.getElementById('installBtn');
-                if (installBtn) {
-                    installBtn.classList.add('d-none');
-                }
-                deferredPrompt = null;
-            });
-
-            // Configurar el botón de instalación
-            const installBtn = document.getElementById('installBtn');
-            if (installBtn) {
-                installBtn.addEventListener('click', async () => {
-                    if (deferredPrompt) {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-                        console.log(`Resultado de la instalación: ${outcome}`);
-                        deferredPrompt = null;
-                        installBtn.classList.add('d-none');
-                    }
-                });
-            }
-        }
 
         function initializeApp() {
             // Verificar si ya hay una sesión activa
@@ -777,7 +675,6 @@
             document.getElementById('loginForm').addEventListener('submit', handleLogin);
             document.getElementById('logoutBtn').addEventListener('click', handleLogout);
             document.getElementById('statusToggle').addEventListener('click', toggleOnlineStatus);
-            document.getElementById('completeRideBtn').addEventListener('click', completeRide);
             document.getElementById('profileBtn').addEventListener('click', showProfileModal);
             document.getElementById('profileModalClose').addEventListener('click', hideProfileModal);
             document.getElementById('requestModalClose').addEventListener('click', hideRequestModal);
@@ -805,12 +702,16 @@
             const password = document.getElementById('password').value;
             const messageDiv = document.getElementById('loginMessage');
 
+            // Mostrar mensaje de carga
             messageDiv.textContent = 'Verificando credenciales...';
             messageDiv.className = 'alert alert-info mt-3';
             messageDiv.classList.remove('d-none');
 
             try {
+                // Cargar conductores desde la base de datos
                 const drivers = await loadDriversFromDatabase();
+
+                // Verificar credenciales
                 const driver = drivers.find(d => d.username === username && d.password === password);
                 
                 if (driver) {
@@ -830,19 +731,29 @@
         }
 
         function handleLogout() {
+            // Desconectar del servicio de ubicación
             if (watchId) {
                 navigator.geolocation.clearWatch(watchId);
             }
             
+            // Detener la verificación de viajes
             if (rideCheckInterval) {
                 clearInterval(rideCheckInterval);
             }
             
+            // Limpiar ruta si existe
+            if (routingControl) {
+                driverMap.removeControl(routingControl);
+                routingControl = null;
+            }
+            
+            // Actualizar estado a desconectado
             if (currentDriver) {
                 updateDriverStatus(false, null, null);
             }
             
             currentDriver = null;
+            currentRide = null;
             localStorage.removeItem('currentDriver');
             showLoginScreen();
         }
@@ -857,15 +768,22 @@
             document.getElementById('loginScreen').classList.add('d-none');
             document.getElementById('mainScreen').classList.remove('d-none');
             
+            // Actualizar información del conductor
             document.getElementById('driverName').textContent = currentDriver.nombre;
             document.getElementById('userInitial').textContent = currentDriver.nombre.charAt(0);
             
+            // Inicializar mapa
             initMap();
+            
+            // Configurar estado inicial
             updateStatusDisplay(currentDriver.en_linea);
+            
+            // Iniciar verificación de viajes
             startRideCheck();
         }
 
         function showProfileModal() {
+            // Actualizar información en el modal
             document.getElementById('profileAvatarInitial').textContent = currentDriver.nombre.charAt(0);
             document.getElementById('profileDriverName').textContent = currentDriver.nombre;
             document.getElementById('profileDriverType').textContent = currentDriver.tipo_vehiculo || 'TAXI';
@@ -875,6 +793,7 @@
             document.getElementById('profileInfoPlate').textContent = currentDriver.placa_vehiculo || 'No especificado';
             document.getElementById('profileInfoSeats').textContent = currentDriver.asientos || 4;
             
+            // Mostrar modal
             document.getElementById('profileModal').classList.add('active');
         }
 
@@ -885,6 +804,7 @@
         function showRequestModal(request) {
             currentRequest = request;
             
+            // Actualizar información en el modal
             document.getElementById('requestAvatarInitial').textContent = request.clients.nombre.charAt(0);
             document.getElementById('requestClientName').textContent = request.clients.nombre;
             
@@ -892,6 +812,8 @@
                 currentDriver.latitud, currentDriver.longitud,
                 request.origen_lat, request.origen_lng
             );
+            
+            const price = request.precio;
             
             document.getElementById('requestModalInfo').innerHTML = `
                 <div class="d-flex align-items-center mb-3">
@@ -904,10 +826,21 @@
                     </div>
                 </div>
                 <div class="mb-2">
-                    <small class="text-muted">Distancia: ${distance.toFixed(1)} km</small>
+                    <small class="text-muted"><i class="bi bi-geo-alt"></i> Origen: ${request.origen_direccion || 'Ubicación del cliente'}</small>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted"><i class="bi bi-geo-alt-fill"></i> Destino: ${request.destino_direccion || 'Destino del cliente'}</small>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted"><i class="bi bi-arrows-angle-expand"></i> Distancia: ${distance.toFixed(1)} km</small>
+                </div>
+                <div class="price-display">
+                    <h4>${price} Bs</h4>
+                    <small>Total del viaje</small>
                 </div>
             `;
             
+            // Mostrar modal
             document.getElementById('requestModal').classList.add('active');
         }
 
@@ -925,31 +858,38 @@
 
         function declineCurrentRequest() {
             if (currentRequest) {
+                // Marcar la solicitud como procesada para no mostrarla de nuevo
                 processedRequests.add(currentRequest.id);
                 hideRequestModal();
             }
         }
 
         function initMap() {
+            // Inicializar el mapa
             driverMap = L.map('map').setView([-16.5000, -68.1500], 13);
             
+            // Agregar capa de OpenStreetMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(driverMap);
             
+            // Obtener ubicación actual
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
                         const lat = position.coords.latitude;
                         const lng = position.coords.longitude;
                         
+                        // Centrar mapa en la ubicación actual
                         driverMap.setView([lat, lng], 15);
                         
+                        // Agregar marcador de ubicación actual
                         driverMarker = L.marker([lat, lng])
                             .addTo(driverMap)
                             .bindPopup('Tu ubicación actual')
                             .openPopup();
                             
+                        // Iniciar seguimiento de ubicación
                         startLocationTracking();
                     },
                     function(error) {
@@ -963,11 +903,13 @@
         }
 
         function startLocationTracking() {
+            // Configurar seguimiento de ubicación en tiempo real
             watchId = navigator.geolocation.watchPosition(
                 function(position) {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
                     
+                    // Actualizar marcador en el mapa
                     if (driverMarker) {
                         driverMarker.setLatLng([lat, lng]);
                     } else {
@@ -976,6 +918,7 @@
                             .bindPopup('Tu ubicación actual');
                     }
                     
+                    // Actualizar ubicación en la base de datos si está en línea
                     if (currentDriver && currentDriver.en_linea) {
                         updateDriverLocation(lat, lng);
                     }
@@ -991,14 +934,59 @@
             );
         }
 
+        function showRouteToDestination(originLat, originLng, destLat, destLng) {
+            // Limpiar ruta anterior si existe
+            if (routingControl) {
+                driverMap.removeControl(routingControl);
+            }
+            
+            // Crear nueva ruta
+            routingControl = L.Routing.control({
+                waypoints: [
+                    L.latLng(originLat, originLng),
+                    L.latLng(destLat, destLng)
+                ],
+                routeWhileDragging: false,
+                showAlternatives: false,
+                lineOptions: {
+                    styles: [{color: '#2e7d32', weight: 5}]
+                },
+                createMarker: function(i, waypoint, n) {
+                    if (i === 0) {
+                        return L.marker(waypoint.latLng, {
+                            icon: L.divIcon({
+                                className: 'custom-marker',
+                                html: '<div style="background-color: #2e7d32; color: white; padding: 5px; border-radius: 50%;">🚗</div>'
+                            })
+                        }).bindPopup('Tu ubicación');
+                    } else {
+                        return L.marker(waypoint.latLng, {
+                            icon: L.divIcon({
+                                className: 'custom-marker',
+                                html: '<div style="background-color: #f44336; color: white; padding: 5px; border-radius: 50%;">🏁</div>'
+                            })
+                        }).bindPopup('Destino');
+                    }
+                }
+            }).addTo(driverMap);
+            
+            // Centrar mapa en la ruta
+            driverMap.fitBounds([
+                [originLat, originLng],
+                [destLat, destLng]
+            ]);
+        }
+
         function toggleOnlineStatus() {
             const statusToggle = document.getElementById('statusToggle');
             const isOnline = !statusToggle.classList.contains('active');
             
             if (isOnline) {
+                // Conectarse
                 updateDriverStatus(true);
                 updateStatusDisplay(true);
                 
+                // Verificar si hay ubicación disponible
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         function(position) {
@@ -1012,9 +1000,23 @@
                     );
                 }
             } else {
+                // Desconectarse
                 updateDriverStatus(false);
                 updateStatusDisplay(false);
+                
+                // Ocultar sección de solicitudes
                 document.getElementById('rideRequestsSection').classList.add('d-none');
+                
+                // Si hay un viaje en curso, cancelarlo
+                if (currentRide) {
+                    cancelActiveRide();
+                }
+                
+                // Limpiar ruta si existe
+                if (routingControl) {
+                    driverMap.removeControl(routingControl);
+                    routingControl = null;
+                }
             }
         }
 
@@ -1066,6 +1068,7 @@
                     throw new Error('Error al actualizar estado');
                 }
                 
+                // Actualizar datos locales
                 currentDriver.en_linea = isOnline;
                 currentDriver.disponible = isOnline;
                 if (lat !== null && lng !== null) {
@@ -1103,6 +1106,7 @@
                     throw new Error('Error al actualizar ubicación');
                 }
                 
+                // Actualizar datos locales
                 currentDriver.latitud = lat;
                 currentDriver.longitud = lng;
                 localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
@@ -1138,18 +1142,20 @@
         }
 
         function startRideCheck() {
+            // Verificar solicitudes de viaje y viajes activos cada 5 segundos
             rideCheckInterval = setInterval(async () => {
-                if (currentDriver && currentDriver.en_linea) {
+                if (currentDriver && currentDriver.en_linea && !currentRide) {
                     await checkForRideRequests();
-                    await checkActiveRide();
                 }
+                await checkActiveRide();
             }, 5000);
         }
 
         async function checkForRideRequests() {
             try {
+                // Buscar viajes solicitados sin conductor asignado
                 const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/rides?estado=eq.solicitado&select=*,clients(nombre,edad)`,
+                    `${SUPABASE_URL}/rest/v1/rides?estado=eq.solicitado&driver_id=is.null&select=*,clients(nombre,edad)`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1165,15 +1171,18 @@
                 const rideRequests = await response.json();
                 
                 if (rideRequests.length > 0) {
+                    // Mostrar la primera solicitud que no haya sido procesada
                     for (const request of rideRequests) {
                         if (!processedRequests.has(request.id)) {
+                            // Mostrar ventana flotante con la solicitud
                             showRequestModal(request);
+                            
+                            // También mostrar en la sección normal
+                            displayRideRequests(rideRequests);
+                            document.getElementById('rideRequestsSection').classList.remove('d-none');
                             break;
                         }
                     }
-                    
-                    displayRideRequests(rideRequests);
-                    document.getElementById('rideRequestsSection').classList.remove('d-none');
                 } else {
                     document.getElementById('rideRequestsSection').classList.add('d-none');
                 }
@@ -1205,7 +1214,13 @@
                         <span class="badge badge-ride">${distance.toFixed(1)} km</span>
                     </div>
                     <div class="mb-2">
-                        <small class="text-muted">Distancia: ${distance.toFixed(1)} km</small>
+                        <small class="text-muted"><i class="bi bi-geo-alt"></i> Origen: ${request.origen_direccion || 'Ubicación del cliente'}</small>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted"><i class="bi bi-geo-alt-fill"></i> Destino: ${request.destino_direccion || 'Destino del cliente'}</small>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted"><i class="bi bi-arrows-angle-expand"></i> Distancia: ${distance.toFixed(1)} km</small>
                     </div>
                     <div class="d-flex gap-2">
                         <button class="btn btn-success btn-sm flex-grow-1" onclick="acceptRide(${request.id})">
@@ -1222,6 +1237,25 @@
 
         async function acceptRide(rideId) {
             try {
+                // Obtener detalles del viaje primero
+                const rideResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}&select=*`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                if (!rideResponse.ok) {
+                    throw new Error('Error al obtener detalles del viaje');
+                }
+
+                const rideData = await rideResponse.json();
+                const ride = rideData[0];
+                
+                // Actualizar el viaje para asignarlo a este conductor
                 const response = await fetch(
                     `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`,
                     {
@@ -1243,10 +1277,26 @@
                     throw new Error('Error al aceptar viaje');
                 }
                 
+                // Marcar como procesada
                 processedRequests.add(rideId);
+                
+                // Actualizar estado del conductor (no disponible)
                 await updateDriverStatus(true, currentDriver.latitud, currentDriver.longitud);
+                await updateDriverAvailability(false);
+                
+                // Ocultar solicitudes
                 document.getElementById('rideRequestsSection').classList.add('d-none');
+                
+                // Cargar información del viaje activo
                 await loadActiveRide();
+                
+                // Mostrar ruta hacia el cliente
+                if (currentDriver.latitud && currentDriver.longitud) {
+                    showRouteToDestination(
+                        currentDriver.latitud, currentDriver.longitud,
+                        ride.origen_lat, ride.origen_lng
+                    );
+                }
                 
             } catch (error) {
                 console.error('Error al aceptar viaje:', error);
@@ -1254,7 +1304,38 @@
             }
         }
 
+        async function updateDriverAvailability(isAvailable) {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({
+                            disponible: isAvailable
+                        })
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error('Error al actualizar disponibilidad');
+                }
+                
+                currentDriver.disponible = isAvailable;
+                localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
+                
+            } catch (error) {
+                console.error('Error al actualizar disponibilidad:', error);
+            }
+        }
+
         async function declineRide(rideId) {
+            // Marcar como procesada para no mostrarla de nuevo
             processedRequests.add(rideId);
             document.getElementById('rideRequestsSection').classList.add('d-none');
         }
@@ -1267,6 +1348,7 @@
 
         async function loadActiveRide() {
             try {
+                // Buscar viajes activos de este conductor
                 const response = await fetch(
                     `${SUPABASE_URL}/rest/v1/rides?driver_id=eq.${currentDriver.id}&estado=in.(aceptado,en_camino)&select=*,clients(nombre,edad)`,
                     {
@@ -1287,10 +1369,17 @@
                     currentRide = activeRides[0];
                     displayActiveRide(currentRide);
                     document.getElementById('activeRideSection').classList.remove('d-none');
-                    await updateDriverStatus(true, currentDriver.latitud, currentDriver.longitud);
+                    
+                    // Actualizar estado a no disponible
+                    await updateDriverAvailability(false);
                 } else {
                     currentRide = null;
                     document.getElementById('activeRideSection').classList.add('d-none');
+                    
+                    // Actualizar estado a disponible si está en línea
+                    if (currentDriver.en_linea) {
+                        await updateDriverAvailability(true);
+                    }
                 }
                 
             } catch (error) {
@@ -1299,43 +1388,48 @@
         }
 
         function displayActiveRide(ride) {
-            const activeRideInfo = document.getElementById('activeRideInfo');
-            const distance = calculateDistance(
-                currentDriver.latitud, currentDriver.longitud,
-                ride.origen_lat, ride.origen_lng
-            );
+            // Actualizar información del viaje
+            document.getElementById('rideClientInitial').textContent = ride.clients.nombre.charAt(0);
+            document.getElementById('rideClientName').textContent = ride.clients.nombre;
+            document.getElementById('rideClientAge').textContent = ride.clients.edad + ' años';
+            document.getElementById('rideOriginAddress').textContent = ride.origen_direccion || 'Origen';
+            document.getElementById('rideDestinationAddress').textContent = ride.destino_direccion || 'Destino';
+            document.getElementById('ridePrice').textContent = ride.precio + ' Bs';
             
-            activeRideInfo.innerHTML = `
-                <div class="d-flex align-items-center mb-3">
-                    <div class="user-avatar me-3">
-                        <span>${ride.clients.nombre.charAt(0)}</span>
-                    </div>
-                    <div class="flex-grow-1">
-                        <h6 class="mb-0">${ride.clients.nombre}</h6>
-                        <small class="text-muted">${ride.clients.edad} años</small>
-                    </div>
-                </div>
-                <div class="mb-2">
-                    <small class="text-muted">Distancia al cliente: ${distance.toFixed(1)} km</small>
-                </div>
-                <div class="mb-2">
-                    <small class="text-muted">Estado: ${ride.estado === 'aceptado' ? 'Esperando cliente' : 'En camino al destino'}</small>
-                </div>
-            `;
+            const rideControls = document.getElementById('rideControls');
             
             if (ride.estado === 'aceptado') {
-                activeRideInfo.innerHTML += `
-                    <div class="mt-3">
-                        <button class="btn app-btn app-btn-primary w-100" onclick="startRide(${ride.id})">
-                            <i class="bi bi-play-circle me-2"></i> Iniciar Viaje
-                        </button>
-                    </div>
+                // Mostrar botón para iniciar viaje
+                rideControls.innerHTML = `
+                    <button class="btn app-btn app-btn-primary w-100 mb-2" onclick="startRide(${ride.id})">
+                        <i class="bi bi-play-circle me-2"></i> Iniciar Viaje
+                    </button>
+                    <button class="btn btn-danger w-100" onclick="cancelActiveRide()">
+                        <i class="bi bi-x-circle me-2"></i> Cancelar Viaje
+                    </button>
                 `;
+                document.getElementById('rideStatusBadge').textContent = 'En camino al cliente';
+                document.getElementById('rideEtaText').textContent = 'Ir a recoger al cliente';
+                document.getElementById('rideProgress').style.width = '20%';
+            } else if (ride.estado === 'en_camino') {
+                // Mostrar botón para completar viaje
+                rideControls.innerHTML = `
+                    <button class="btn app-btn app-btn-primary w-100 mb-2" onclick="completeRide(${ride.id})">
+                        <i class="bi bi-check-circle me-2"></i> Completar Viaje
+                    </button>
+                    <button class="btn btn-danger w-100" onclick="cancelActiveRide()">
+                        <i class="bi bi-x-circle me-2"></i> Cancelar Viaje
+                    </button>
+                `;
+                document.getElementById('rideStatusBadge').textContent = 'En camino al destino';
+                document.getElementById('rideEtaText').textContent = 'Llevando al destino';
+                document.getElementById('rideProgress').style.width = '60%';
             }
         }
 
         async function startRide(rideId) {
             try {
+                // Actualizar estado del viaje a "en_camino"
                 const response = await fetch(
                     `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`,
                     {
@@ -1356,6 +1450,29 @@
                     throw new Error('Error al iniciar viaje');
                 }
                 
+                // Cargar información actualizada del viaje
+                const rideResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}&select=*`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                const rideData = await rideResponse.json();
+                const ride = rideData[0];
+                
+                // Mostrar ruta hacia el destino
+                if (currentDriver.latitud && currentDriver.longitud) {
+                    showRouteToDestination(
+                        ride.origen_lat, ride.origen_lng,
+                        ride.destino_lat, ride.destino_lng
+                    );
+                }
+                
+                // Recargar información del viaje activo
                 await loadActiveRide();
                 
             } catch (error) {
@@ -1364,12 +1481,11 @@
             }
         }
 
-        async function completeRide() {
-            if (!currentRide) return;
-            
+        async function completeRide(rideId) {
             try {
+                // Actualizar estado del viaje a "completado"
                 const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${currentRide.id}`,
+                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`,
                     {
                         method: 'PATCH',
                         headers: {
@@ -1388,10 +1504,20 @@
                     throw new Error('Error al completar viaje');
                 }
                 
+                // Limpiar ruta
+                if (routingControl) {
+                    driverMap.removeControl(routingControl);
+                    routingControl = null;
+                }
+                
+                // Limpiar viaje actual
                 currentRide = null;
                 document.getElementById('activeRideSection').classList.add('d-none');
-                await updateDriverStatus(true, currentDriver.latitud, currentDriver.longitud);
-                alert('Viaje completado exitosamente');
+                
+                // Volver a estar disponible
+                await updateDriverAvailability(true);
+                
+                alert('Viaje completado exitosamente. ¡Gracias!');
                 
             } catch (error) {
                 console.error('Error al completar viaje:', error);
@@ -1399,8 +1525,58 @@
             }
         }
 
+        async function cancelActiveRide() {
+            if (!currentRide) return;
+            
+            if (confirm('¿Estás seguro de que quieres cancelar este viaje?')) {
+                try {
+                    // Actualizar estado del viaje a "cancelado"
+                    const response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/rides?id=eq.${currentRide.id}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify({
+                                estado: 'cancelado',
+                                driver_id: null
+                            })
+                        }
+                    );
+
+                    if (!response.ok) {
+                        throw new Error('Error al cancelar viaje');
+                    }
+                    
+                    // Limpiar ruta
+                    if (routingControl) {
+                        driverMap.removeControl(routingControl);
+                        routingControl = null;
+                    }
+                    
+                    // Limpiar viaje actual
+                    currentRide = null;
+                    document.getElementById('activeRideSection').classList.add('d-none');
+                    
+                    // Volver a estar disponible
+                    await updateDriverAvailability(true);
+                    
+                    alert('Viaje cancelado');
+                    
+                } catch (error) {
+                    console.error('Error al cancelar viaje:', error);
+                    alert('Error al cancelar el viaje. Intente nuevamente.');
+                }
+            }
+        }
+
+        // Función auxiliar para calcular distancia entre dos puntos
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
+            const R = 6371; // Radio de la Tierra en km
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = 
@@ -1416,6 +1592,8 @@
         window.acceptRide = acceptRide;
         window.declineRide = declineRide;
         window.startRide = startRide;
+        window.completeRide = completeRide;
+        window.cancelActiveRide = cancelActiveRide;
     </script>
 </body>
 </html>
