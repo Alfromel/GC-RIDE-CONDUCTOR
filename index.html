@@ -14,6 +14,9 @@
             --primary-dark: #1b5e20;
             --primary-light: #4caf50;
             --accent-color: #8bc34a;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --success-color: #4caf50;
             --text-color: #333;
             --light-gray: #f5f5f5;
             --gray: #9e9e9e;
@@ -35,6 +38,7 @@
             min-height: 100vh;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
+            overflow-x: hidden;
         }
         
         .app-header {
@@ -49,7 +53,7 @@
         
         .app-content {
             padding: 20px;
-            padding-bottom: 80px;
+            padding-bottom: 100px;
         }
         
         .app-card {
@@ -98,18 +102,6 @@
             box-shadow: 0 6px 15px rgba(46, 125, 50, 0.4);
         }
         
-        .app-form-control {
-            border-radius: 10px;
-            padding: 12px 15px;
-            border: 1px solid #e0e0e0;
-            transition: all 0.3s;
-        }
-        
-        .app-form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
-        }
-        
         .status-toggle {
             width: 60px;
             height: 30px;
@@ -133,6 +125,7 @@
             top: 2px;
             left: 2px;
             transition: transform 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
         .status-toggle.active .status-toggle-handle {
@@ -144,6 +137,7 @@
             width: 100%;
             border-radius: 10px;
             margin-top: 15px;
+            border: 2px solid #e0e0e0;
         }
         
         .ride-request {
@@ -152,7 +146,20 @@
             padding: 20px;
             margin-bottom: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 4px solid var(--primary-color);
+            border-left: 4px solid var(--warning-color);
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         .user-avatar {
@@ -210,8 +217,26 @@
         }
         
         .badge-ride {
-            background: #ff9800;
+            background: var(--warning-color);
             color: white;
+        }
+        
+        .badge-new {
+            background: var(--danger-color);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
         
         .login-container {
@@ -231,35 +256,13 @@
         }
         
         /* Estilos para modales */
-        .profile-btn {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            padding: 10px 20px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
-            transition: all 0.3s;
-            margin: 15px auto;
-            width: fit-content;
-        }
-        
-        .profile-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(46, 125, 50, 0.4);
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
-        }
-        
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -267,6 +270,7 @@
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s;
+            padding: 20px;
         }
         
         .modal-overlay.active {
@@ -277,12 +281,14 @@
         .modal-content {
             background: white;
             border-radius: 16px;
-            width: 90%;
+            width: 100%;
             max-width: 450px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
             transform: translateY(20px);
             transition: transform 0.3s;
             overflow: hidden;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         .modal-overlay.active .modal-content {
@@ -360,23 +366,7 @@
         
         /* Estilos específicos para modal de solicitud */
         .request-modal .modal-header {
-            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-        }
-        
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
-            }
-        }
-        
-        .pulse-modal {
-            animation: pulse 2s infinite;
+            background: linear-gradient(135deg, var(--warning-color) 0%, #f57c00 100%);
         }
         
         .price-display {
@@ -391,6 +381,7 @@
         .price-display h4 {
             color: #1976d2;
             margin: 0;
+            font-weight: 700;
         }
         
         .price-display small {
@@ -404,6 +395,7 @@
             padding: 10px;
             max-height: 200px;
             overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
         .ride-info-panel {
@@ -412,7 +404,7 @@
             padding: 20px;
             margin-bottom: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-left: 4px solid #ff9800;
+            border-left: 4px solid var(--warning-color);
         }
         
         .progress-container {
@@ -423,12 +415,87 @@
             height: 10px;
             border-radius: 5px;
             background-color: #e9ecef;
+            overflow: hidden;
         }
         
         .progress-bar {
             height: 100%;
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
             border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: #e0e0e0;
+            margin-bottom: 15px;
+        }
+        
+        .new-request-indicator {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+        
+        .distance-badge {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .request-time {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-left: auto;
+        }
+        
+        .btn-group-flex {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-group-flex .btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -443,13 +510,13 @@
             <form id="loginForm">
                 <div class="mb-3">
                     <label for="username" class="form-label">Usuario</label>
-                    <input type="text" class="form-control app-form-control" id="username" required>
+                    <input type="text" class="form-control" id="username" required placeholder="Ingresa tu usuario">
                 </div>
                 <div class="mb-4">
                     <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control app-form-control" id="password" required>
+                    <input type="password" class="form-control" id="password" required placeholder="Ingresa tu contraseña">
                 </div>
-                <button type="submit" class="btn app-btn app-btn-primary w-100 text-white">
+                <button type="submit" class="btn btn-primary w-100 py-3" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%); border: none;">
                     <i class="bi bi-box-arrow-in-right me-2"></i> Ingresar
                 </button>
             </form>
@@ -463,7 +530,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h5 class="mb-0">GC Ride</h5>
-                        <small id="driverName" class="fw-bold"></small>
+                        <small id="driverName" class="fw-bold">Conductor</small>
                     </div>
                     <div class="d-flex align-items-center">
                         <span id="statusBadge" class="badge-status badge-offline me-2">Desconectado</span>
@@ -476,12 +543,6 @@
 
             <!-- Contenido principal -->
             <div class="app-content">
-                <!-- Botón de Perfil -->
-                <button id="profileBtn" class="profile-btn">
-                    <i class="bi bi-person-circle"></i>
-                    <span>Mi Perfil</span>
-                </button>
-
                 <!-- Estado de conexión -->
                 <div class="app-card">
                     <div class="app-card-header d-flex align-items-center">
@@ -490,11 +551,12 @@
                     </div>
                     <div class="app-card-body">
                         <div class="d-flex justify-content-between align-items-center">
-                            <span id="statusText">Desconectado</span>
+                            <span id="statusText" class="fw-medium">Desconectado</span>
                             <div id="statusToggle" class="status-toggle">
                                 <div class="status-toggle-handle"></div>
                             </div>
                         </div>
+                        <small id="statusDescription" class="text-muted d-block mt-2">Activa para recibir solicitudes</small>
                     </div>
                 </div>
 
@@ -506,6 +568,9 @@
                     </div>
                     <div class="app-card-body">
                         <div id="map"></div>
+                        <div class="mt-2 text-center">
+                            <small class="text-muted">Última actualización: <span id="lastUpdateTime">--:--</span></small>
+                        </div>
                     </div>
                 </div>
 
@@ -523,19 +588,30 @@
                             <span id="rideStatusBadge" class="badge-ride badge-status">En Camino</span>
                         </div>
                         
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-1">
+                                <small class="text-muted"><i class="bi bi-geo-alt me-1"></i> Origen:</small>
+                            </div>
+                            <p class="mb-2" id="rideOriginAddress" style="font-size: 0.9rem;">Cargando...</p>
+                            
+                            <div class="d-flex align-items-center mb-1 mt-3">
+                                <small class="text-muted"><i class="bi bi-geo-alt-fill me-1"></i> Destino:</small>
+                            </div>
+                            <p class="mb-2" id="rideDestinationAddress" style="font-size: 0.9rem;">Cargando...</p>
+                        </div>
+                        
                         <div class="progress-container">
                             <div class="d-flex justify-content-between mb-1">
-                                <small id="rideOriginAddress">Origen</small>
-                                <small id="rideEtaText">Llegando en 5 min</small>
+                                <small>Progreso del viaje</small>
+                                <small id="rideEtaText">Calculando...</small>
                             </div>
                             <div class="progress">
                                 <div id="rideProgress" class="progress-bar" style="width: 0%"></div>
                             </div>
-                            <small id="rideDestinationAddress" class="text-muted">Destino</small>
                         </div>
                         
                         <div class="price-display mt-3">
-                            <h4 id="ridePrice">13 Bs</h4>
+                            <h4 id="ridePrice">0 Bs</h4>
                             <small>Total del viaje</small>
                         </div>
                         
@@ -548,15 +624,25 @@
                 <!-- Solicitudes de viaje -->
                 <div id="rideRequestsSection" class="d-none">
                     <div class="app-card">
-                        <div class="app-card-header d-flex align-items-center">
+                        <div class="app-card-header d-flex align-items-center position-relative">
                             <i class="bi bi-bell me-2"></i>
                             <span>Solicitudes de Viaje</span>
+                            <div id="requestCountBadge" class="badge-new badge-status ms-2">0</div>
                         </div>
                         <div class="app-card-body">
                             <div id="rideRequestsList">
                                 <!-- Las solicitudes aparecerán aquí -->
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Sin solicitudes -->
+                <div id="noRequestsSection" class="d-none">
+                    <div class="empty-state">
+                        <i class="bi bi-bell-slash"></i>
+                        <h6>Sin solicitudes</h6>
+                        <p class="text-muted">No hay solicitudes de viaje disponibles en este momento</p>
                     </div>
                 </div>
             </div>
@@ -595,13 +681,17 @@
                             <span class="info-label">Asientos:</span>
                             <span class="info-value" id="profileInfoSeats"></span>
                         </div>
+                        <div class="info-item">
+                            <span class="info-label">Estado:</span>
+                            <span id="profileInfoStatus" class="info-value">Desconectado</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Modal de Solicitud de Viaje -->
+            <!-- Modal de Solicitud de Viaje (Notificación emergente) -->
             <div id="requestModal" class="modal-overlay request-modal">
-                <div class="modal-content pulse-modal">
+                <div class="modal-content">
                     <div class="modal-header">
                         <button class="modal-close" id="requestModalClose">
                             <i class="bi bi-x-lg"></i>
@@ -609,37 +699,35 @@
                         <div class="modal-avatar">
                             <span id="requestAvatarInitial">U</span>
                         </div>
-                        <h5 id="requestClientName" class="mb-0">Nueva Solicitud de Viaje</h5>
+                        <h5 id="requestClientName" class="mb-0">¡Nueva solicitud!</h5>
                         <p class="mb-0 opacity-75">Cliente esperando</p>
                     </div>
                     <div class="modal-body">
                         <div id="requestModalInfo">
                             <!-- Información de la solicitud -->
                         </div>
-                        <div class="d-flex gap-2 mt-4">
-                            <button id="acceptRequestBtn" class="btn btn-success flex-grow-1">
-                                <i class="bi bi-check-lg me-1"></i> Aceptar Viaje
+                        <div class="btn-group-flex mt-4">
+                            <button id="acceptRequestBtn" class="btn btn-success">
+                                <i class="bi bi-check-lg me-1"></i> Aceptar
                             </button>
                             <button id="declineRequestBtn" class="btn btn-secondary">
-                                <i class="bi bi-x-lg"></i>
+                                <i class="bi bi-x-lg me-1"></i> Rechazar
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Botón flotante para cerrar sesión -->
-            <button id="logoutBtn" class="floating-action-btn" title="Cerrar sesión">
-                <i class="bi bi-box-arrow-right"></i>
+            <!-- Botón flotante para perfil -->
+            <button id="profileBtn" class="floating-action-btn" title="Mi perfil">
+                <i class="bi bi-person-circle"></i>
             </button>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Leaflet Routing Machine -->
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     
     <script>
@@ -654,9 +742,12 @@
         let watchId = null;
         let currentRide = null;
         let rideCheckInterval = null;
+        let requestCheckInterval = null;
         let currentRequest = null;
         let processedRequests = new Set();
         let routingControl = null;
+        let lastLocationUpdate = null;
+        let newRequestsCount = 0;
 
         // Inicializar la aplicación
         document.addEventListener('DOMContentLoaded', function() {
@@ -673,89 +764,112 @@
 
             // Configurar event listeners
             document.getElementById('loginForm').addEventListener('submit', handleLogin);
-            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-            document.getElementById('statusToggle').addEventListener('click', toggleOnlineStatus);
             document.getElementById('profileBtn').addEventListener('click', showProfileModal);
             document.getElementById('profileModalClose').addEventListener('click', hideProfileModal);
-            document.getElementById('requestModalClose').addEventListener('click', hideRequestModal);
+            document.getElementById('requestModalClose').addEventListener('click', declineCurrentRequest);
             document.getElementById('acceptRequestBtn').addEventListener('click', acceptCurrentRequest);
             document.getElementById('declineRequestBtn').addEventListener('click', declineCurrentRequest);
+            document.getElementById('statusToggle').addEventListener('click', toggleOnlineStatus);
             
             // Cerrar modales al hacer clic fuera del contenido
             document.getElementById('profileModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    hideProfileModal();
-                }
+                if (e.target === this) hideProfileModal();
             });
             
             document.getElementById('requestModal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    hideRequestModal();
-                }
+                if (e.target === this) declineCurrentRequest();
             });
         }
 
         async function handleLogin(e) {
             e.preventDefault();
             
-            const username = document.getElementById('username').value;
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
             const messageDiv = document.getElementById('loginMessage');
 
-            // Mostrar mensaje de carga
-            messageDiv.textContent = 'Verificando credenciales...';
-            messageDiv.className = 'alert alert-info mt-3';
-            messageDiv.classList.remove('d-none');
+            if (!username || !password) {
+                messageDiv.textContent = 'Por favor, completa todos los campos';
+                messageDiv.classList.remove('d-none');
+                return;
+            }
 
             try {
-                // Cargar conductores desde la base de datos
-                const drivers = await loadDriversFromDatabase();
+                // Mostrar carga
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verificando...';
+                submitBtn.disabled = true;
 
-                // Verificar credenciales
-                const driver = drivers.find(d => d.username === username && d.password === password);
+                // Obtener conductores de Supabase
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/drivers`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error de conexión');
+
+                const drivers = await response.json();
+                
+                // Buscar conductor con credenciales
+                const driver = drivers.find(d => 
+                    d.username === username && 
+                    d.password === password
+                );
                 
                 if (driver) {
+                    // Actualizar estado a desconectado por defecto
+                    await updateDriverStatus(driver.id, false);
+                    driver.en_linea = false;
+                    driver.disponible = false;
+                    
                     currentDriver = driver;
                     localStorage.setItem('currentDriver', JSON.stringify(driver));
+                    
                     showMainScreen();
                     messageDiv.classList.add('d-none');
                 } else {
                     messageDiv.textContent = 'Usuario o contraseña incorrectos';
-                    messageDiv.className = 'alert alert-danger mt-3';
+                    messageDiv.classList.remove('d-none');
                 }
+                
             } catch (error) {
-                console.error('Error en el login:', error);
+                console.error('Error en login:', error);
                 messageDiv.textContent = 'Error de conexión. Intente nuevamente.';
-                messageDiv.className = 'alert alert-danger mt-3';
+                messageDiv.classList.remove('d-none');
+            } finally {
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
             }
         }
 
         function handleLogout() {
-            // Desconectar del servicio de ubicación
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
+            if (confirm('¿Deseas cerrar sesión?')) {
+                // Desconectar del servicio de ubicación
+                if (watchId) {
+                    navigator.geolocation.clearWatch(watchId);
+                }
+                
+                // Detener verificaciones
+                if (rideCheckInterval) clearInterval(rideCheckInterval);
+                if (requestCheckInterval) clearInterval(requestCheckInterval);
+                
+                // Actualizar estado a desconectado
+                if (currentDriver) {
+                    updateDriverStatus(currentDriver.id, false);
+                }
+                
+                // Limpiar estado
+                currentDriver = null;
+                currentRide = null;
+                processedRequests.clear();
+                localStorage.removeItem('currentDriver');
+                
+                showLoginScreen();
             }
-            
-            // Detener la verificación de viajes
-            if (rideCheckInterval) {
-                clearInterval(rideCheckInterval);
-            }
-            
-            // Limpiar ruta si existe
-            if (routingControl) {
-                driverMap.removeControl(routingControl);
-                routingControl = null;
-            }
-            
-            // Actualizar estado a desconectado
-            if (currentDriver) {
-                updateDriverStatus(false, null, null);
-            }
-            
-            currentDriver = null;
-            currentRide = null;
-            localStorage.removeItem('currentDriver');
-            showLoginScreen();
         }
 
         function showLoginScreen() {
@@ -771,6 +885,11 @@
             // Actualizar información del conductor
             document.getElementById('driverName').textContent = currentDriver.nombre;
             document.getElementById('userInitial').textContent = currentDriver.nombre.charAt(0);
+            document.getElementById('profileBtn').innerHTML = `<i class="bi bi-person-circle"></i>`;
+            
+            // Cambiar el botón flotante para cerrar sesión
+            document.getElementById('profileBtn').onclick = handleLogout;
+            document.getElementById('profileBtn').title = "Cerrar sesión";
             
             // Inicializar mapa
             initMap();
@@ -778,13 +897,20 @@
             // Configurar estado inicial
             updateStatusDisplay(currentDriver.en_linea);
             
-            // Iniciar verificación de viajes
+            // Iniciar verificaciones
             startRideCheck();
+            startRequestCheck();
+            
+            // Verificar si hay viaje activo
+            checkActiveRide();
         }
 
         function showProfileModal() {
-            // Actualizar información en el modal
-            document.getElementById('profileAvatarInitial').textContent = currentDriver.nombre.charAt(0);
+            if (!currentDriver) return;
+            
+            // Actualizar información
+            const initial = currentDriver.nombre.charAt(0);
+            document.getElementById('profileAvatarInitial').textContent = initial;
             document.getElementById('profileDriverName').textContent = currentDriver.nombre;
             document.getElementById('profileDriverType').textContent = currentDriver.tipo_vehiculo || 'TAXI';
             document.getElementById('profileInfoName').textContent = currentDriver.nombre;
@@ -792,6 +918,8 @@
             document.getElementById('profileInfoModel').textContent = currentDriver.modelo_vehiculo || 'No especificado';
             document.getElementById('profileInfoPlate').textContent = currentDriver.placa_vehiculo || 'No especificado';
             document.getElementById('profileInfoSeats').textContent = currentDriver.asientos || 4;
+            document.getElementById('profileInfoStatus').textContent = currentDriver.en_linea ? 'En línea' : 'Desconectado';
+            document.getElementById('profileInfoStatus').style.color = currentDriver.en_linea ? 'var(--primary-color)' : 'var(--danger-color)';
             
             // Mostrar modal
             document.getElementById('profileModal').classList.add('active');
@@ -804,43 +932,54 @@
         function showRequestModal(request) {
             currentRequest = request;
             
-            // Actualizar información en el modal
-            document.getElementById('requestAvatarInitial').textContent = request.clients.nombre.charAt(0);
-            document.getElementById('requestClientName').textContent = request.clients.nombre;
+            // Actualizar información
+            const clientName = request.clients?.nombre || 'Cliente';
+            const clientAge = request.clients?.edad || '';
+            const initial = clientName.charAt(0);
             
+            document.getElementById('requestAvatarInitial').textContent = initial;
+            document.getElementById('requestClientName').textContent = clientName;
+            
+            // Calcular distancia
             const distance = calculateDistance(
                 currentDriver.latitud, currentDriver.longitud,
                 request.origen_lat, request.origen_lng
             );
             
-            const price = request.precio;
-            
+            // Mostrar información detallada
             document.getElementById('requestModalInfo').innerHTML = `
-                <div class="d-flex align-items-center mb-3">
-                    <div class="user-avatar me-3">
-                        <span>${request.clients.nombre.charAt(0)}</span>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="user-avatar me-3">
+                            <span>${initial}</span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">${clientName}</h6>
+                            ${clientAge ? `<small class="text-muted">${clientAge} años</small>` : ''}
+                        </div>
+                        <span class="distance-badge">${distance.toFixed(1)} km</span>
                     </div>
-                    <div class="flex-grow-1">
-                        <h6 class="mb-0">${request.clients.nombre}</h6>
-                        <small class="text-muted">${request.clients.edad} años</small>
-                    </div>
                 </div>
-                <div class="mb-2">
-                    <small class="text-muted"><i class="bi bi-geo-alt"></i> Origen: ${request.origen_direccion || 'Ubicación del cliente'}</small>
+                
+                <div class="mb-3">
+                    <small class="text-muted d-block mb-1"><i class="bi bi-geo-alt me-1"></i> Recoger en:</small>
+                    <p class="mb-2" style="font-size: 0.9rem;">${request.origen_direccion || 'Ubicación del cliente'}</p>
+                    
+                    <small class="text-muted d-block mb-1 mt-3"><i class="bi bi-geo-alt-fill me-1"></i> Destino:</small>
+                    <p class="mb-2" style="font-size: 0.9rem;">${request.destino_direccion || 'Destino del cliente'}</p>
                 </div>
-                <div class="mb-2">
-                    <small class="text-muted"><i class="bi bi-geo-alt-fill"></i> Destino: ${request.destino_direccion || 'Destino del cliente'}</small>
-                </div>
-                <div class="mb-2">
-                    <small class="text-muted"><i class="bi bi-arrows-angle-expand"></i> Distancia: ${distance.toFixed(1)} km</small>
-                </div>
+                
                 <div class="price-display">
-                    <h4>${price} Bs</h4>
-                    <small>Total del viaje</small>
+                    <h4>${request.precio} Bs</h4>
+                    <small>Precio total del viaje</small>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <small class="text-muted">Tiempo estimado: ${request.tiempo_estimado || 10} min</small>
                 </div>
             `;
             
-            // Mostrar modal
+            // Mostrar modal con animación
             document.getElementById('requestModal').classList.add('active');
         }
 
@@ -850,7 +989,9 @@
         }
 
         function acceptCurrentRequest() {
-            if (currentRequest) {
+            if (!currentRequest) return;
+            
+            if (confirm(`¿Aceptar viaje con ${currentRequest.clients?.nombre || 'el cliente'} por ${currentRequest.precio} Bs?`)) {
                 acceptRide(currentRequest.id);
                 hideRequestModal();
             }
@@ -858,19 +999,20 @@
 
         function declineCurrentRequest() {
             if (currentRequest) {
-                // Marcar la solicitud como procesada para no mostrarla de nuevo
                 processedRequests.add(currentRequest.id);
+                newRequestsCount = Math.max(0, newRequestsCount - 1);
+                updateRequestCount();
                 hideRequestModal();
             }
         }
 
         function initMap() {
-            // Inicializar el mapa
+            // Inicializar mapa centrado en una ubicación por defecto
             driverMap = L.map('map').setView([-16.5000, -68.1500], 13);
             
             // Agregar capa de OpenStreetMap
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
+                attribution: '© OpenStreetMap'
             }).addTo(driverMap);
             
             // Obtener ubicación actual
@@ -880,143 +1022,136 @@
                         const lat = position.coords.latitude;
                         const lng = position.coords.longitude;
                         
-                        // Centrar mapa en la ubicación actual
+                        // Centrar mapa
                         driverMap.setView([lat, lng], 15);
                         
-                        // Agregar marcador de ubicación actual
-                        driverMarker = L.marker([lat, lng])
-                            .addTo(driverMap)
-                            .bindPopup('Tu ubicación actual')
-                            .openPopup();
-                            
-                        // Iniciar seguimiento de ubicación
+                        // Agregar marcador
+                        driverMarker = L.marker([lat, lng], {
+                            icon: L.divIcon({
+                                className: 'driver-marker',
+                                html: '<div style="background: #2e7d32; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><i class="bi bi-car-front"></i></div>'
+                            })
+                        })
+                        .addTo(driverMap)
+                        .bindPopup('Tu ubicación actual');
+                        
+                        // Iniciar seguimiento
                         startLocationTracking();
                     },
                     function(error) {
-                        console.error('Error obteniendo ubicación:', error);
-                        alert('No se pudo obtener tu ubicación. Asegúrate de permitir el acceso a la ubicación.');
+                        console.error('Error ubicación:', error);
+                        // Usar ubicación del conductor de la BD
+                        if (currentDriver.latitud && currentDriver.longitud) {
+                            driverMap.setView([currentDriver.latitud, currentDriver.longitud], 15);
+                        }
                     }
                 );
-            } else {
-                alert('Tu navegador no soporta geolocalización.');
             }
         }
 
         function startLocationTracking() {
-            // Configurar seguimiento de ubicación en tiempo real
+            // Configurar seguimiento continuo
             watchId = navigator.geolocation.watchPosition(
                 function(position) {
                     const lat = position.coords.latitude;
                     const lng = position.coords.longitude;
+                    const timestamp = new Date().toLocaleTimeString();
                     
-                    // Actualizar marcador en el mapa
+                    // Actualizar marcador
                     if (driverMarker) {
                         driverMarker.setLatLng([lat, lng]);
                     } else {
-                        driverMarker = L.marker([lat, lng])
-                            .addTo(driverMap)
-                            .bindPopup('Tu ubicación actual');
+                        driverMarker = L.marker([lat, lng], {
+                            icon: L.divIcon({
+                                className: 'driver-marker',
+                                html: '<div style="background: #2e7d32; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"><i class="bi bi-car-front"></i></div>'
+                            })
+                        }).addTo(driverMap);
                     }
                     
-                    // Actualizar ubicación en la base de datos si está en línea
+                    // Actualizar tiempo
+                    document.getElementById('lastUpdateTime').textContent = timestamp;
+                    lastLocationUpdate = timestamp;
+                    
+                    // Actualizar en BD si está en línea
                     if (currentDriver && currentDriver.en_linea) {
                         updateDriverLocation(lat, lng);
                     }
                 },
                 function(error) {
-                    console.error('Error en seguimiento de ubicación:', error);
+                    console.error('Error tracking:', error);
                 },
                 {
                     enableHighAccuracy: true,
                     timeout: 10000,
-                    maximumAge: 60000
+                    maximumAge: 0
                 }
             );
         }
 
-        function showRouteToDestination(originLat, originLng, destLat, destLng) {
-            // Limpiar ruta anterior si existe
-            if (routingControl) {
-                driverMap.removeControl(routingControl);
-            }
-            
-            // Crear nueva ruta
-            routingControl = L.Routing.control({
-                waypoints: [
-                    L.latLng(originLat, originLng),
-                    L.latLng(destLat, destLng)
-                ],
-                routeWhileDragging: false,
-                showAlternatives: false,
-                lineOptions: {
-                    styles: [{color: '#2e7d32', weight: 5}]
-                },
-                createMarker: function(i, waypoint, n) {
-                    if (i === 0) {
-                        return L.marker(waypoint.latLng, {
-                            icon: L.divIcon({
-                                className: 'custom-marker',
-                                html: '<div style="background-color: #2e7d32; color: white; padding: 5px; border-radius: 50%;">🚗</div>'
-                            })
-                        }).bindPopup('Tu ubicación');
-                    } else {
-                        return L.marker(waypoint.latLng, {
-                            icon: L.divIcon({
-                                className: 'custom-marker',
-                                html: '<div style="background-color: #f44336; color: white; padding: 5px; border-radius: 50%;">🏁</div>'
-                            })
-                        }).bindPopup('Destino');
-                    }
-                }
-            }).addTo(driverMap);
-            
-            // Centrar mapa en la ruta
-            driverMap.fitBounds([
-                [originLat, originLng],
-                [destLat, destLng]
-            ]);
-        }
-
         function toggleOnlineStatus() {
-            const statusToggle = document.getElementById('statusToggle');
-            const isOnline = !statusToggle.classList.contains('active');
+            if (!currentDriver) return;
+            
+            const isOnline = !currentDriver.en_linea;
             
             if (isOnline) {
-                // Conectarse
-                updateDriverStatus(true);
-                updateStatusDisplay(true);
-                
-                // Verificar si hay ubicación disponible
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        function(position) {
-                            const lat = position.coords.latitude;
-                            const lng = position.coords.longitude;
-                            updateDriverLocation(lat, lng);
-                        },
-                        function(error) {
-                            console.error('Error obteniendo ubicación:', error);
-                        }
-                    );
+                // Verificar ubicación antes de conectarse
+                if (!navigator.geolocation) {
+                    alert('El navegador no soporta geolocalización');
+                    return;
                 }
+                
+                navigator.geolocation.getCurrentPosition(
+                    async function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        // Actualizar estado en BD
+                        await updateDriverStatus(currentDriver.id, true);
+                        await updateDriverLocation(lat, lng);
+                        
+                        // Actualizar estado local
+                        currentDriver.en_linea = true;
+                        currentDriver.disponible = true;
+                        currentDriver.latitud = lat;
+                        currentDriver.longitud = lng;
+                        localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
+                        
+                        // Actualizar UI
+                        updateStatusDisplay(true);
+                        
+                        // Mostrar solicitudes
+                        document.getElementById('noRequestsSection').classList.add('d-none');
+                        document.getElementById('rideRequestsSection').classList.remove('d-none');
+                        
+                        // Forzar carga de solicitudes
+                        await checkForRideRequests(true);
+                        
+                        showToast('¡Estás en línea!', 'success');
+                    },
+                    function(error) {
+                        alert('Permite acceso a ubicación para conectarte');
+                    }
+                );
             } else {
-                // Desconectarse
-                updateDriverStatus(false);
+                // Desconectar
+                updateDriverStatus(currentDriver.id, false);
+                currentDriver.en_linea = false;
+                currentDriver.disponible = false;
+                localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
+                
                 updateStatusDisplay(false);
                 
-                // Ocultar sección de solicitudes
+                // Ocultar solicitudes
                 document.getElementById('rideRequestsSection').classList.add('d-none');
+                document.getElementById('noRequestsSection').classList.remove('d-none');
                 
-                // Si hay un viaje en curso, cancelarlo
-                if (currentRide) {
-                    cancelActiveRide();
-                }
+                // Limpiar solicitudes
+                processedRequests.clear();
+                newRequestsCount = 0;
+                updateRequestCount();
                 
-                // Limpiar ruta si existe
-                if (routingControl) {
-                    driverMap.removeControl(routingControl);
-                    routingControl = null;
-                }
+                showToast('Te has desconectado', 'info');
             }
         }
 
@@ -1024,136 +1159,99 @@
             const statusToggle = document.getElementById('statusToggle');
             const statusText = document.getElementById('statusText');
             const statusBadge = document.getElementById('statusBadge');
+            const statusDescription = document.getElementById('statusDescription');
             
             if (isOnline) {
                 statusToggle.classList.add('active');
-                statusText.textContent = 'En Línea - Recibiendo solicitudes';
+                statusText.textContent = 'En Línea';
+                statusText.style.color = 'var(--primary-color)';
                 statusBadge.textContent = 'En Línea';
                 statusBadge.className = 'badge-status badge-online me-2';
+                statusDescription.textContent = 'Recibiendo solicitudes de viaje';
+                statusDescription.style.color = 'var(--primary-color)';
             } else {
                 statusToggle.classList.remove('active');
                 statusText.textContent = 'Desconectado';
+                statusText.style.color = 'var(--dark-gray)';
                 statusBadge.textContent = 'Desconectado';
                 statusBadge.className = 'badge-status badge-offline me-2';
+                statusDescription.textContent = 'Activa para recibir solicitudes';
+                statusDescription.style.color = 'var(--gray)';
             }
         }
 
-        async function updateDriverStatus(isOnline, lat = null, lng = null) {
+        async function updateDriverStatus(driverId, isOnline) {
             try {
-                const updateData = {
-                    en_linea: isOnline,
-                    disponible: isOnline
-                };
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/drivers?id=eq.${driverId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
+                        en_linea: isOnline,
+                        disponible: isOnline
+                    })
+                });
                 
-                if (lat !== null && lng !== null) {
-                    updateData.latitud = lat;
-                    updateData.longitud = lng;
-                }
-                
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`,
-                    {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Prefer': 'return=minimal'
-                        },
-                        body: JSON.stringify(updateData)
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Error al actualizar estado');
-                }
-                
-                // Actualizar datos locales
-                currentDriver.en_linea = isOnline;
-                currentDriver.disponible = isOnline;
-                if (lat !== null && lng !== null) {
-                    currentDriver.latitud = lat;
-                    currentDriver.longitud = lng;
-                }
-                
-                localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
+                if (!response.ok) throw new Error('Error estado');
                 
             } catch (error) {
-                console.error('Error al actualizar estado:', error);
+                console.error('Error estado:', error);
             }
         }
 
         async function updateDriverLocation(lat, lng) {
+            if (!currentDriver) return;
+            
             try {
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`,
-                    {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Prefer': 'return=minimal'
-                        },
-                        body: JSON.stringify({
-                            latitud: lat,
-                            longitud: lng
-                        })
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Error al actualizar ubicación');
-                }
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
+                        latitud: lat,
+                        longitud: lng
+                    })
+                });
                 
-                // Actualizar datos locales
+                if (!response.ok) throw new Error('Error ubicación');
+                
+                // Actualizar localmente
                 currentDriver.latitud = lat;
                 currentDriver.longitud = lng;
                 localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
                 
             } catch (error) {
-                console.error('Error al actualizar ubicación:', error);
-            }
-        }
-
-        async function loadDriversFromDatabase() {
-            try {
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/drivers`,
-                    {
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
-                        }
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Error al cargar conductores');
-                }
-
-                const drivers = await response.json();
-                return drivers;
-                
-            } catch (error) {
-                console.error('Error al cargar conductores:', error);
-                throw new Error('No se pudo conectar con la base de datos. Intente nuevamente.');
+                console.error('Error ubicación:', error);
             }
         }
 
         function startRideCheck() {
-            // Verificar solicitudes de viaje y viajes activos cada 5 segundos
+            // Verificar viajes activos cada 3 segundos
             rideCheckInterval = setInterval(async () => {
-                if (currentDriver && currentDriver.en_linea && !currentRide) {
+                await checkActiveRide();
+            }, 3000);
+        }
+
+        function startRequestCheck() {
+            // Verificar solicitudes cada 5 segundos
+            requestCheckInterval = setInterval(async () => {
+                if (currentDriver && currentDriver.en_linea) {
                     await checkForRideRequests();
                 }
-                await checkActiveRide();
             }, 5000);
         }
 
-        async function checkForRideRequests() {
+        async function checkForRideRequests(forceShow = false) {
+            if (!currentDriver || !currentDriver.en_linea) return;
+            
             try {
-                // Buscar viajes solicitados sin conductor asignado
+                // Obtener solicitudes sin conductor asignado
                 const response = await fetch(
                     `${SUPABASE_URL}/rest/v1/rides?estado=eq.solicitado&driver_id=is.null&select=*,clients(nombre,edad)`,
                     {
@@ -1164,70 +1262,111 @@
                     }
                 );
 
-                if (!response.ok) {
-                    throw new Error('Error al cargar solicitudes');
-                }
+                if (!response.ok) throw new Error('Error solicitudes');
 
-                const rideRequests = await response.json();
+                const requests = await response.json();
                 
-                if (rideRequests.length > 0) {
-                    // Mostrar la primera solicitud que no haya sido procesada
-                    for (const request of rideRequests) {
-                        if (!processedRequests.has(request.id)) {
-                            // Mostrar ventana flotante con la solicitud
-                            showRequestModal(request);
-                            
-                            // También mostrar en la sección normal
-                            displayRideRequests(rideRequests);
-                            document.getElementById('rideRequestsSection').classList.remove('d-none');
-                            break;
+                // Filtrar solicitudes ya procesadas
+                const newRequests = requests.filter(req => !processedRequests.has(req.id));
+                
+                if (newRequests.length > 0) {
+                    // Mostrar notificación emergente si es la primera vez o forzado
+                    if (forceShow || (!currentRequest && newRequests.length > newRequestsCount)) {
+                        newRequestsCount = newRequests.length;
+                        updateRequestCount();
+                        
+                        // Mostrar modal con la primera solicitud nueva
+                        const latestRequest = newRequests[0];
+                        if (!currentRequest) {
+                            showRequestModal(latestRequest);
                         }
                     }
+                    
+                    // Mostrar en lista
+                    displayRideRequests(newRequests);
+                    
+                    // Mostrar sección
+                    document.getElementById('rideRequestsSection').classList.remove('d-none');
+                    document.getElementById('noRequestsSection').classList.add('d-none');
                 } else {
+                    // Mostrar estado vacío
                     document.getElementById('rideRequestsSection').classList.add('d-none');
+                    document.getElementById('noRequestsSection').classList.remove('d-none');
+                    newRequestsCount = 0;
+                    updateRequestCount();
                 }
                 
             } catch (error) {
-                console.error('Error al verificar solicitudes:', error);
+                console.error('Error solicitudes:', error);
+            }
+        }
+
+        function updateRequestCount() {
+            const badge = document.getElementById('requestCountBadge');
+            badge.textContent = newRequestsCount;
+            
+            if (newRequestsCount > 0) {
+                badge.classList.remove('d-none');
+            } else {
+                badge.classList.add('d-none');
             }
         }
 
         function displayRideRequests(requests) {
-            const requestsList = document.getElementById('rideRequestsList');
+            const container = document.getElementById('rideRequestsList');
             
-            requestsList.innerHTML = requests.map(request => {
+            container.innerHTML = requests.map(request => {
+                const clientName = request.clients?.nombre || 'Cliente';
+                const clientAge = request.clients?.edad || '';
+                const initial = clientName.charAt(0);
                 const distance = calculateDistance(
                     currentDriver.latitud, currentDriver.longitud,
                     request.origen_lat, request.origen_lng
                 );
                 
+                // Formatear tiempo de solicitud
+                const requestTime = new Date(request.created_at).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
                 return `
                 <div class="ride-request">
                     <div class="d-flex align-items-center mb-2">
                         <div class="user-avatar me-3">
-                            <span>${request.clients.nombre.charAt(0)}</span>
+                            <span>${initial}</span>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="mb-0">${request.clients.nombre}</h6>
-                            <small class="text-muted">${request.clients.edad} años</small>
+                            <h6 class="mb-0">${clientName}</h6>
+                            ${clientAge ? `<small class="text-muted">${clientAge} años</small>` : ''}
                         </div>
-                        <span class="badge badge-ride">${distance.toFixed(1)} km</span>
+                        <span class="distance-badge">${distance.toFixed(1)} km</span>
                     </div>
+                    
                     <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-geo-alt"></i> Origen: ${request.origen_direccion || 'Ubicación del cliente'}</small>
+                        <small class="text-muted d-block mb-1"><i class="bi bi-geo-alt me-1"></i> Origen:</small>
+                        <p class="mb-0" style="font-size: 0.85rem;">${request.origen_direccion || 'Ubicación del cliente'}</p>
                     </div>
-                    <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-geo-alt-fill"></i> Destino: ${request.destino_direccion || 'Destino del cliente'}</small>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1"><i class="bi bi-geo-alt-fill me-1"></i> Destino:</small>
+                        <p class="mb-0" style="font-size: 0.85rem;">${request.destino_direccion || 'Destino del cliente'}</p>
                     </div>
-                    <div class="mb-2">
-                        <small class="text-muted"><i class="bi bi-arrows-angle-expand"></i> Distancia: ${distance.toFixed(1)} km</small>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="fw-bold" style="color: var(--primary-dark);">${request.precio} Bs</span>
+                            <small class="text-muted ms-2">${request.tiempo_estimado || 10} min</small>
+                        </div>
+                        <small class="request-time">${requestTime}</small>
                     </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-success btn-sm flex-grow-1" onclick="acceptRide(${request.id})">
+                    
+                    <div class="btn-group-flex">
+                        <button class="btn btn-success" onclick="acceptRide(${request.id})">
                             <i class="bi bi-check-lg me-1"></i> Aceptar
                         </button>
-                        <button class="btn btn-secondary btn-sm" onclick="declineRide(${request.id})">
-                            <i class="bi bi-x-lg"></i>
+                        <button class="btn btn-outline-secondary" onclick="declineRide(${request.id})">
+                            <i class="bi bi-x-lg me-1"></i> Rechazar
                         </button>
                     </div>
                 </div>
@@ -1236,119 +1375,83 @@
         }
 
         async function acceptRide(rideId) {
+            if (!currentDriver || !currentDriver.en_linea) {
+                alert('Debes estar en línea para aceptar viajes');
+                return;
+            }
+            
             try {
-                // Obtener detalles del viaje primero
-                const rideResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}&select=*`,
-                    {
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
-                        }
-                    }
-                );
+                // Actualizar el viaje asignándolo a este conductor
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
+                        driver_id: currentDriver.id,
+                        estado: 'aceptado',
+                        updated_at: new Date().toISOString()
+                    })
+                });
 
-                if (!rideResponse.ok) {
-                    throw new Error('Error al obtener detalles del viaje');
-                }
-
-                const rideData = await rideResponse.json();
-                const ride = rideData[0];
+                if (!response.ok) throw new Error('Error aceptar viaje');
                 
-                // Actualizar el viaje para asignarlo a este conductor
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`,
-                    {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Prefer': 'return=minimal'
-                        },
-                        body: JSON.stringify({
-                            driver_id: currentDriver.id,
-                            estado: 'aceptado'
-                        })
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Error al aceptar viaje');
-                }
+                // Actualizar disponibilidad del conductor
+                await fetch(`${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
+                        disponible: false
+                    })
+                });
+                
+                currentDriver.disponible = false;
+                localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
                 
                 // Marcar como procesada
                 processedRequests.add(rideId);
+                newRequestsCount = Math.max(0, newRequestsCount - 1);
+                updateRequestCount();
                 
-                // Actualizar estado del conductor (no disponible)
-                await updateDriverStatus(true, currentDriver.latitud, currentDriver.longitud);
-                await updateDriverAvailability(false);
+                // Ocultar modal si está visible
+                hideRequestModal();
                 
-                // Ocultar solicitudes
+                // Limpiar lista de solicitudes
                 document.getElementById('rideRequestsSection').classList.add('d-none');
                 
-                // Cargar información del viaje activo
-                await loadActiveRide();
+                // Mostrar mensaje
+                showToast('¡Viaje aceptado!', 'success');
                 
-                // Mostrar ruta hacia el cliente
-                if (currentDriver.latitud && currentDriver.longitud) {
-                    showRouteToDestination(
-                        currentDriver.latitud, currentDriver.longitud,
-                        ride.origen_lat, ride.origen_lng
-                    );
-                }
+                // Recargar viaje activo
+                await checkActiveRide();
                 
             } catch (error) {
-                console.error('Error al aceptar viaje:', error);
-                alert('Error al aceptar el viaje. Intente nuevamente.');
+                console.error('Error aceptar:', error);
+                alert('Error al aceptar el viaje');
             }
         }
 
-        async function updateDriverAvailability(isAvailable) {
-            try {
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`,
-                    {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Prefer': 'return=minimal'
-                        },
-                        body: JSON.stringify({
-                            disponible: isAvailable
-                        })
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Error al actualizar disponibilidad');
-                }
-                
-                currentDriver.disponible = isAvailable;
-                localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
-                
-            } catch (error) {
-                console.error('Error al actualizar disponibilidad:', error);
-            }
-        }
-
-        async function declineRide(rideId) {
-            // Marcar como procesada para no mostrarla de nuevo
+        function declineRide(rideId) {
             processedRequests.add(rideId);
-            document.getElementById('rideRequestsSection').classList.add('d-none');
+            newRequestsCount = Math.max(0, newRequestsCount - 1);
+            updateRequestCount();
+            
+            // Recargar solicitudes
+            checkForRideRequests();
+            
+            showToast('Solicitud rechazada', 'info');
         }
 
         async function checkActiveRide() {
-            if (currentDriver) {
-                await loadActiveRide();
-            }
-        }
-
-        async function loadActiveRide() {
+            if (!currentDriver) return;
+            
             try {
-                // Buscar viajes activos de este conductor
                 const response = await fetch(
                     `${SUPABASE_URL}/rest/v1/rides?driver_id=eq.${currentDriver.id}&estado=in.(aceptado,en_camino)&select=*,clients(nombre,edad)`,
                     {
@@ -1359,224 +1462,206 @@
                     }
                 );
 
-                if (!response.ok) {
-                    throw new Error('Error al cargar viaje activo');
-                }
+                if (!response.ok) throw new Error('Error viaje activo');
 
-                const activeRides = await response.json();
+                const rides = await response.json();
                 
-                if (activeRides.length > 0) {
-                    currentRide = activeRides[0];
+                if (rides.length > 0) {
+                    currentRide = rides[0];
                     displayActiveRide(currentRide);
-                    document.getElementById('activeRideSection').classList.remove('d-none');
-                    
-                    // Actualizar estado a no disponible
-                    await updateDriverAvailability(false);
                 } else {
                     currentRide = null;
                     document.getElementById('activeRideSection').classList.add('d-none');
                     
-                    // Actualizar estado a disponible si está en línea
+                    // Volver a estar disponible si está en línea
                     if (currentDriver.en_linea) {
-                        await updateDriverAvailability(true);
+                        await fetch(`${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            },
+                            body: JSON.stringify({
+                                disponible: true
+                            })
+                        });
+                        
+                        currentDriver.disponible = true;
+                        localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
                     }
                 }
                 
             } catch (error) {
-                console.error('Error al verificar viaje activo:', error);
+                console.error('Error viaje activo:', error);
             }
         }
 
         function displayActiveRide(ride) {
-            // Actualizar información del viaje
-            document.getElementById('rideClientInitial').textContent = ride.clients.nombre.charAt(0);
-            document.getElementById('rideClientName').textContent = ride.clients.nombre;
-            document.getElementById('rideClientAge').textContent = ride.clients.edad + ' años';
+            // Actualizar información básica
+            const clientName = ride.clients?.nombre || 'Cliente';
+            const clientAge = ride.clients?.edad || '';
+            
+            document.getElementById('rideClientInitial').textContent = clientName.charAt(0);
+            document.getElementById('rideClientName').textContent = clientName;
+            document.getElementById('rideClientAge').textContent = clientAge ? `${clientAge} años` : '';
             document.getElementById('rideOriginAddress').textContent = ride.origen_direccion || 'Origen';
             document.getElementById('rideDestinationAddress').textContent = ride.destino_direccion || 'Destino';
-            document.getElementById('ridePrice').textContent = ride.precio + ' Bs';
+            document.getElementById('ridePrice').textContent = `${ride.precio} Bs`;
             
-            const rideControls = document.getElementById('rideControls');
+            const controlsDiv = document.getElementById('rideControls');
             
             if (ride.estado === 'aceptado') {
-                // Mostrar botón para iniciar viaje
-                rideControls.innerHTML = `
-                    <button class="btn app-btn app-btn-primary w-100 mb-2" onclick="startRide(${ride.id})">
-                        <i class="bi bi-play-circle me-2"></i> Iniciar Viaje
-                    </button>
-                    <button class="btn btn-danger w-100" onclick="cancelActiveRide()">
-                        <i class="bi bi-x-circle me-2"></i> Cancelar Viaje
-                    </button>
-                `;
                 document.getElementById('rideStatusBadge').textContent = 'En camino al cliente';
                 document.getElementById('rideEtaText').textContent = 'Ir a recoger al cliente';
-                document.getElementById('rideProgress').style.width = '20%';
-            } else if (ride.estado === 'en_camino') {
-                // Mostrar botón para completar viaje
-                rideControls.innerHTML = `
-                    <button class="btn app-btn app-btn-primary w-100 mb-2" onclick="completeRide(${ride.id})">
-                        <i class="bi bi-check-circle me-2"></i> Completar Viaje
+                document.getElementById('rideProgress').style.width = '30%';
+                
+                controlsDiv.innerHTML = `
+                    <button class="btn btn-primary w-100 mb-2" onclick="startRideTrip(${ride.id})">
+                        <i class="bi bi-play-circle me-2"></i> Iniciar Viaje
                     </button>
-                    <button class="btn btn-danger w-100" onclick="cancelActiveRide()">
-                        <i class="bi bi-x-circle me-2"></i> Cancelar Viaje
+                    <button class="btn btn-outline-danger w-100" onclick="cancelActiveRide()">
+                        <i class="bi bi-x-circle me-2"></i> Cancelar
                     </button>
                 `;
+            } else if (ride.estado === 'en_camino') {
                 document.getElementById('rideStatusBadge').textContent = 'En camino al destino';
                 document.getElementById('rideEtaText').textContent = 'Llevando al destino';
-                document.getElementById('rideProgress').style.width = '60%';
+                document.getElementById('rideProgress').style.width = '70%';
+                
+                controlsDiv.innerHTML = `
+                    <button class="btn btn-success w-100 mb-2" onclick="completeRide(${ride.id})">
+                        <i class="bi bi-check-circle me-2"></i> Completar Viaje
+                    </button>
+                    <button class="btn btn-outline-danger w-100" onclick="cancelActiveRide()">
+                        <i class="bi bi-x-circle me-2"></i> Cancelar
+                    </button>
+                `;
             }
+            
+            document.getElementById('activeRideSection').classList.remove('d-none');
         }
 
-        async function startRide(rideId) {
+        async function startRideTrip(rideId) {
             try {
-                // Actualizar estado del viaje a "en_camino"
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`,
-                    {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Prefer': 'return=minimal'
-                        },
-                        body: JSON.stringify({
-                            estado: 'en_camino'
-                        })
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Error al iniciar viaje');
-                }
+                await fetch(`${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
+                        estado: 'en_camino'
+                    })
+                });
                 
-                // Cargar información actualizada del viaje
-                const rideResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}&select=*`,
-                    {
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
-                        }
-                    }
-                );
-
-                const rideData = await rideResponse.json();
-                const ride = rideData[0];
-                
-                // Mostrar ruta hacia el destino
-                if (currentDriver.latitud && currentDriver.longitud) {
-                    showRouteToDestination(
-                        ride.origen_lat, ride.origen_lng,
-                        ride.destino_lat, ride.destino_lng
-                    );
-                }
-                
-                // Recargar información del viaje activo
-                await loadActiveRide();
+                showToast('Viaje iniciado', 'success');
+                await checkActiveRide();
                 
             } catch (error) {
-                console.error('Error al iniciar viaje:', error);
-                alert('Error al iniciar el viaje. Intente nuevamente.');
+                console.error('Error iniciar viaje:', error);
+                alert('Error al iniciar viaje');
             }
         }
 
         async function completeRide(rideId) {
-            try {
-                // Actualizar estado del viaje a "completado"
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`,
-                    {
+            if (confirm('¿Marcar viaje como completado?')) {
+                try {
+                    await fetch(`${SUPABASE_URL}/rest/v1/rides?id=eq.${rideId}`, {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
                             'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Prefer': 'return=minimal'
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
                         },
                         body: JSON.stringify({
                             estado: 'completado'
                         })
+                    });
+                    
+                    showToast('¡Viaje completado!', 'success');
+                    
+                    // Resetear estado
+                    currentRide = null;
+                    document.getElementById('activeRideSection').classList.add('d-none');
+                    
+                    // Volver a estar disponible
+                    if (currentDriver.en_linea) {
+                        await fetch(`${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            },
+                            body: JSON.stringify({
+                                disponible: true
+                            })
+                        });
+                        
+                        currentDriver.disponible = true;
+                        localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
                     }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Error al completar viaje');
+                    
+                } catch (error) {
+                    console.error('Error completar viaje:', error);
+                    alert('Error al completar viaje');
                 }
-                
-                // Limpiar ruta
-                if (routingControl) {
-                    driverMap.removeControl(routingControl);
-                    routingControl = null;
-                }
-                
-                // Limpiar viaje actual
-                currentRide = null;
-                document.getElementById('activeRideSection').classList.add('d-none');
-                
-                // Volver a estar disponible
-                await updateDriverAvailability(true);
-                
-                alert('Viaje completado exitosamente. ¡Gracias!');
-                
-            } catch (error) {
-                console.error('Error al completar viaje:', error);
-                alert('Error al completar el viaje. Intente nuevamente.');
             }
         }
 
         async function cancelActiveRide() {
             if (!currentRide) return;
             
-            if (confirm('¿Estás seguro de que quieres cancelar este viaje?')) {
+            if (confirm('¿Cancelar este viaje?')) {
                 try {
-                    // Actualizar estado del viaje a "cancelado"
-                    const response = await fetch(
-                        `${SUPABASE_URL}/rest/v1/rides?id=eq.${currentRide.id}`,
-                        {
-                            method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'apikey': SUPABASE_KEY,
-                                'Authorization': `Bearer ${SUPABASE_KEY}`,
-                                'Prefer': 'return=minimal'
-                            },
-                            body: JSON.stringify({
-                                estado: 'cancelado',
-                                driver_id: null
-                            })
-                        }
-                    );
-
-                    if (!response.ok) {
-                        throw new Error('Error al cancelar viaje');
-                    }
+                    await fetch(`${SUPABASE_URL}/rest/v1/rides?id=eq.${currentRide.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        },
+                        body: JSON.stringify({
+                            estado: 'cancelado',
+                            driver_id: null
+                        })
+                    });
                     
-                    // Limpiar ruta
-                    if (routingControl) {
-                        driverMap.removeControl(routingControl);
-                        routingControl = null;
-                    }
+                    showToast('Viaje cancelado', 'warning');
                     
-                    // Limpiar viaje actual
+                    // Resetear estado
                     currentRide = null;
                     document.getElementById('activeRideSection').classList.add('d-none');
                     
                     // Volver a estar disponible
-                    await updateDriverAvailability(true);
-                    
-                    alert('Viaje cancelado');
+                    if (currentDriver.en_linea) {
+                        await fetch(`${SUPABASE_URL}/rest/v1/drivers?id=eq.${currentDriver.id}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            },
+                            body: JSON.stringify({
+                                disponible: true
+                            })
+                        });
+                        
+                        currentDriver.disponible = true;
+                        localStorage.setItem('currentDriver', JSON.stringify(currentDriver));
+                    }
                     
                 } catch (error) {
-                    console.error('Error al cancelar viaje:', error);
-                    alert('Error al cancelar el viaje. Intente nuevamente.');
+                    console.error('Error cancelar viaje:', error);
+                    alert('Error al cancelar viaje');
                 }
             }
         }
 
-        // Función auxiliar para calcular distancia entre dos puntos
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Radio de la Tierra en km
+            const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = 
@@ -1584,14 +1669,37 @@
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
                 Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            const distance = R * c;
-            return distance;
+            return R * c;
         }
 
-        // Hacer funciones accesibles globalmente
+        function showToast(message, type = 'info') {
+            // Crear toast
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0 position-fixed`;
+            toast.style.cssText = 'top: 70px; right: 15px; z-index: 1100;';
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'warning' ? 'bi-exclamation-circle' : 'bi-info-circle'} me-2"></i>
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // Hacer funciones globales
         window.acceptRide = acceptRide;
         window.declineRide = declineRide;
-        window.startRide = startRide;
+        window.startRideTrip = startRideTrip;
         window.completeRide = completeRide;
         window.cancelActiveRide = cancelActiveRide;
     </script>
